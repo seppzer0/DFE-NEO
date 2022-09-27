@@ -1,0 +1,52 @@
+
+
+
+# ================================================== #
+# legacy or neo
+
+DFE method= neo
+
+# ================================================== #
+# both | in-current | un-current
+
+Flash SLOT= both
+
+# ================================================== #
+# none|system|bootloader|recovery
+
+Reboot after installing= none
+
+# ================================================== #
+
+# You can add your own language, to do this, just 
+drop a file into the language folder by analogy 
+with the topic that is already there
+
+# indo|russian|english|
+# vietnamese|spanish|hungary|
+
+Language=russian
+
+# ================================================== #
+Force reading arguments.txt=false
+# ================================================== #
+Flash DFE= true
+Disable AVB= true
+Disable QUOTA= true
+Safetynet fix= true
+Flash Magisk= true
+Force Zygisk mode= true
+Add castom packages automatic in denylist= true
+# ================================================== #
+Reflash Recovery for OTA= false
+Reflash current Recovery for Recovery= true
+# ================================================== #
+Wipe DATA= false
+Remove PIN= false
+# ================================================== #
+Skip warning= true
+Hide not encrypted=true
+# ================================================== #
+
+!!!! Only miui !!!!
+DISABLE DYNAMIC REFRESHRATE= false
