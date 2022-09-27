@@ -50,9 +50,7 @@ DFE() {
         done
     fi
 }
-
-
-DFE() {
+DFE_INIT() {
     fstabp="$1"
     g=$(
         echo "fileencryption="
