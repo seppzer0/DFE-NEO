@@ -25,13 +25,9 @@ maybe_set_prop() {
         echo "$DFE_NEO_VER : $(date +%G:%m:%d:%H:%M:%S:%N) -- Not needed reseted $prop with $contains on $value because value $([[ -z $(getprop "$prop") ]] && echo "empty" || echo $(getprop "$prop"))" >>$tmp/logdfe.txt
     fi
 }
-
 DFE() {
-
     fstabp="$1"
-
     g=$(
-
         echo "fileencryption="
         echo "forcefdeorfbe="
         echo "encryptable="
@@ -40,18 +36,13 @@ DFE() {
         echo "keydirectory="
         echo "avb="
         echo "avb_keys="
-
     )
-
     g2=$(
-
         echo "avb"
         echo "quota"
         echo "inlinecrypt"
         echo "wrappedkey"
-
     )
-
     while ($(
         for i in $g; do grep -q "$i" $fstabp && return 0; done
         return 1
@@ -83,82 +74,18 @@ DFE() {
             echo "$DFE_NEO_VER : $(date +%G:%m:%d:%H:%M:%S:%N) -- Remove $remove FLAG" >>$tmp/logdfe.txt
         done
     fi
-    #sed -i 's|/devices/platform/|#/devices/platform/|g' $fstabp
 }
 
 case $2 in
-whiledata)
-
-    until [[ "$(getprop sys.boot_completed)" == "1" ]]; do
-        echo "$DFE_NEO_VER : $(date +%G:%m:%d:%H:%M:%S:%N) -- Check while tick" >>$tmp/logdfe.txt
-        sleep 0.5
-    done
-
-    echo "$DFE_NEO_VER : $(date +%G:%m:%d:%H:%M:%S:%N) -- Check while fin" >>$tmp/logdfe.txt
-
-    ;;
-whiledata2)
-
-    while ! (mount | grep -q "magisk"); do
-        echo "$DFE_NEO_VER : $(date +%G:%m:%d:%H:%M:%S:%N) -- not magisk mount" >>$tmp/logdfe.txt
-    done
-    echo "$DFE_NEO_VER : $(date +%G:%m:%d:%H:%M:%S:%N) -- Check whilemount fin" >>$tmp/logdfe.txt
-
-    ;;
-whiledata3)
-    # {
-    while ! (ls $tmp/ | grep -q magiskpolicy); do
-        echo "dummy"
-    done
-    sleep 0.1
-    PATH=$tmp/.magisk/mirror/system_root/system/bin:$PATH
-    umount -f /system/bin/magisk
-    umount -f /system/bin/magiskpolicy
-    umount -f $tmp/.magisk/pts
-    rm -f /system/bin/su /system/bin/magisk /system/bin/magiskpolicy /system/bin/supolicy
-    rm -f $tmp/magisk $tmp/magisk64 $tmp/magisk32 $tmp/su $tmp/supolicy $tmp/magiskpolicy
-    mount -o ro,remount /system/bin
-    sleep 0.05
-    mkdir $tmp/mount_system
-    mount -r $tmp/.magisk/block/system_root $tmp/mount_system
-    PATH=$tmp/system_root/system/bin:$PATH
-    $tmp/system_root/system/bin/mount $tmp/system_root/system /system
-
-    for file in $(mount | grep magisk | grep /system/bin | awk '{print $3}'); do
-        umount -f $file
-        (mountpoint -q /system) && umount -f /system
-        $tmp/system_root/system/bin/mount $tmp/system_root/system /system
-    done
-    #mount $tmp/.magisk/mirror/system_root/system /system
-    #mount -o ro,remount /system/bin
-    #rm -f $tmp/magisk $tmp/magisk64 $tmp/magisk32 $tmp/magiskpolicy $tmp/supolicy
-    #echo "$DFE_NEO_VER : $(date +%G:%m:%d:%H:%M:%S:%N) -- Check magisk files mirror fin" >> $tmp/logdfe.txt
-    # }
-    #{
-    #while ! ( ls /system/bin/ | grep -q magiskpolicy ) ; do
-    # echo "dummy"
-    # done
-    #   rm -f /system/bin/su /system/bin/magisk /system/bin/magiskpolicy /system/bin/supolicy
-    #echo "$DFE_NEO_VER : $(date +%G:%m:%d:%H:%M:%S:%N) -- Check magisk files mirror fin" >> $tmp/logdfe.txt
-    # }
-    ;;
-
-\
-    add_denylist)
-
+add_denylist)
     $tmp/magisk --denylist enable
-
     for line in $(cat $tmp/denylist.txt); do
         line1=${line%\|*}
         line2=${line#*\|}
         $tmp/magisk --denylist add $line1 $line2
     done
-
     ;;
-
-\
-    zygisk_on)
-
+zygisk_on)
     while ! [ -d /data/system ]; do
         sleep 0.05
     done
@@ -179,9 +106,7 @@ whiledata3)
         chmod 600 /data/adb/magisk.db
     fi
     ;;
-
-\
-    if_without_magisk_stop)
+if_without_magisk_stop)
     if [ -f $tmp/dummy_magisk ]; then
         $tmp/magisk --stop
     fi
@@ -209,10 +134,7 @@ check_magisk_bin)
     fi
     chmod 777 $tmp/.magisk/zygisk/*
     ;;
-
-\
-    \
-    check_magisk_bin_test)
+check_magisk_bin_test)
     if ! [ -f $tmp/magisk64 ] || ! [ -f $tmp/magisk32 ]; then
         if [ -f $tmp/my_mg_64 ]; then
             cp $tmp/my_mg_64 $tmp/magisk64
@@ -222,31 +144,20 @@ check_magisk_bin)
             cp $tmp/my_mg_32 $tmp/magisk32
             chmod 777 $tmp/magisk32
         fi
-        #rm -f $tmp/su $tmp/resetprop $tmp/magisk
-        #ln -sf $neo_resetprop $tmp/magisk
-        #ln -sf $neo_resetprop $tmp/resetprop
         echo '#dummy' >>$tmp/dummy_magisk
     fi
     ;;
 casefold_remove)
-
     echo "$DFE_NEO_VER : $(date +%G:%m:%d:%H:%M:%S:%N) -- Starting $2" >>$tmp/logdfe.txt
-
     $neo_resetprop resetprop --delete external_storage.projid.enabled
     $neo_resetprop resetprop --delete external_storage.casefold.enabled
     $neo_resetprop resetprop --delete external_storage.sdcardfs.enabled
-
     echo "$DFE_NEO_VER : $(date +%G:%m:%d:%H:%M:%S:%N) -- Ending $2" >>$tmp/logdfe.txt
     ;;
-
 patch_dfe)
-
     echo "$DFE_NEO_VER : $(date +%G:%m:%d:%H:%M:%S:%N) -- Starting $2" >>$tmp/logdfe.txt
-
     mkdir -pv $tmp/dfe_tmp_fstab/
-
     tmpF=$tmp/dfe_tmp_fstab
-
     for fstab in $(find /system /system_ext /odm /product /vendor -name "*fstab*"); do
         if (grep "/userdata" $fstab) &&
             (grep "/metadata" $fstab); then
@@ -262,16 +173,10 @@ patch_dfe)
     done
     maybe_set_prop ro.dfe.neo.state encrypted decrypted
     echo "$DFE_NEO_VER : $(date +%G:%m:%d:%H:%M:%S:%N) -- Ending $2" >>$tmp/logdfe.txt
-
     ;;
-
-\
-    post_mount_dfe)
-
+post_mount_dfe)
     echo "$DFE_NEO_VER : $(date +%G:%m:%d:%H:%M:%S:%N) -- Starting $2" >>$tmp/logdfe.txt
-
     tmpF=$tmp/dfe_tmp_fstab
-
     for fstab in $(find /system /system_ext /odm /product /vendor -name "*fstab*"); do
         if (grep "/userdata" $fstab) && (grep "/metadata" $fstab) && [[ -f $tmpF$fstab ]]; then
             if ! [ $(stat -c%s $fstab) = $(stat -c%s $tmpF$fstab) ]; then
@@ -283,13 +188,9 @@ patch_dfe)
         fi
     done
     echo "$DFE_NEO_VER : $(date +%G:%m:%d:%H:%M:%S:%N) -- Ending $2" >>$tmp/logdfe.txt
-
     ;;
-
-\
-    safetynet_init)
+safetynet_init)
     echo "$DFE_NEO_VER : $(date +%G:%m:%d:%H:%M:%S:%N) -- Starting $2" >>$tmp/logdfe.txt
-
     $neo_resetprop resetprop ro.build.type user
     $neo_resetprop resetprop ro.debuggable 0
     $neo_resetprop resetprop ro.secure 1
@@ -305,12 +206,8 @@ patch_dfe)
     $neo_resetprop resetprop ro.warranty_bit 0
     $neo_resetprop resetprop ro.is_ever_orange 0
     echo "$DFE_NEO_VER : $(date +%G:%m:%d:%H:%M:%S:%N) -- Ending $2" >>$tmp/logdfe.txt
-    #chmod 777 $tmp/init.dfe.sh
-    #sh $tmp/init.dfe.sh "$tmp" "whiledata" &
     ;;
-
-\
-    safetynet_fs)
+safetynet_fs)
     echo "$DFE_NEO_VER : $(date +%G:%m:%d:%H:%M:%S:%N) -- Starting $2" >>$tmp/logdfe.txt
 
     maybe_set_prop ro.bootmode recovery unknown
@@ -327,23 +224,16 @@ patch_dfe)
     fi
     echo "$DFE_NEO_VER : $(date +%G:%m:%d:%H:%M:%S:%N) -- Ending $2" >>$tmp/logdfe.txt
     ;;
-
-\
-    safetynet_boot_complite)
+safetynet_boot_complite)
     echo "$DFE_NEO_VER : $(date +%G:%m:%d:%H:%M:%S:%N) -- Starting $2" >>$tmp/logdfe.txt
 
     $neo_resetprop resetprop vendor.boot.verifiedbootstate green
 
     echo "$DFE_NEO_VER : $(date +%G:%m:%d:%H:%M:%S:%N) -- Ending $2" >>$tmp/logdfe.txt
     ;;
-
-\
-    \
-    patch120dynamic)
+patch120dynamic)
     echo "$DFE_NEO_VER : $(date +%G:%m:%d:%H:%M:%S:%N) -- Starting $2" >>$tmp/logdfe.txt
-
     pm $3 com.miui.powerkeeper/.statemachine.PowerStateMachineService
-
     echo "$DFE_NEO_VER : $(date +%G:%m:%d:%H:%M:%S:%N) -- Ending $2" >>$tmp/logdfe.txt
     ;;
 esac

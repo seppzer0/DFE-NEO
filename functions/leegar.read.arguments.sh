@@ -1,62 +1,62 @@
 #!/sbin/sh
 
 read_argumetns_file() {
-    echo $(mygrep_arg "Skip warnin") | grep -q "true" &&
+    mygrep_arg "Skip warnin" | grep -q "true" &&
         skip_warning=true || skip_warning=false
 
-    echo $(mygrep_arg "DFE method") | grep -q "legacy" &&
+    mygrep_arg "DFE method" | grep -q "legacy" &&
         legacy_mode=true || legacy_mode=false
 
-    echo $(mygrep_arg "Flash Magisk") | grep -q "true" &&
+    mygrep_arg "Flash Magisk" | grep -q "true" &&
         Flash_Magisk=true || Flash_Magisk=false
 
-    echo $(mygrep_arg "Hide No Encryption") | grep -q "true" &&
+    mygrep_arg "Hide No Encryption" | grep -q "true" &&
         Hide_No_Encryption=true || Hide_No_Encryption=false
 
-    echo $(mygrep_arg "Reflash Recovery for OTA") | grep -q "true" &&
+    mygrep_arg "Reflash Recovery for OTA" | grep -q "true" &&
         Reflash_Recovery_After_Oat=true || Reflash_Recovery_After_Oat=false
 
-    echo $(mygrep_arg "Reflash current Recovery for Recovery") | grep -q "true" &&
+    mygrep_arg "Reflash current Recovery for Recovery" | grep -q "true" &&
         Flash_Current_Rerovery=true || Flash_Current_Rerovery=false
 
-    echo $(mygrep_arg "Hide not encrypted") | grep -q "true" &&
+    mygrep_arg "Hide not encrypted" | grep -q "true" &&
         Hide_No_Encryption=true || Hide_No_Encryption=false
 
-    echo $(mygrep_arg "DISABLE DYNAMIC REFRESHRATE") | grep -q "true" &&
+    mygrep_arg "DISABLE DYNAMIC REFRESHRATE" | grep -q "true" &&
         dynamic120hz=true || dynamic120hz=false
 
-    echo $(mygrep_arg "Wipe DATA") | grep -q "true" &&
+    mygrep_arg "Wipe DATA" | grep -q "true" &&
         wipe_data=true || wipe_data=false
 
-    echo $(mygrep_arg "Remove PIN") | grep -q "true" &&
+    mygrep_arg "Remove PIN" | grep -q "true" &&
         rem_lock=true || rem_lock=false
 
-    echo $(mygrep_arg "Disable QUOTA") | grep -q "true" &&
+    mygrep_arg "Disable QUOTA" | grep -q "true" &&
         QUOTA_STAY=true || QUOTA_STAY=false
 
-    echo $(mygrep_arg "Disable AVB") | grep -q "true" &&
+    mygrep_arg "Disable AVB" | grep -q "true" &&
         AVB_STAY=true || AVB_STAY=false
 
-    echo $(mygrep_arg "Reboot after installing") | grep -q "system" &&
+    mygrep_arg "Reboot after installing" | grep -q "system" &&
         rebootARG=system && rebootafter=true
 
-    echo $(mygrep_arg "Reboot after installing") | grep -q "bootloader" &&
+    mygrep_arg "Reboot after installing" | grep -q "bootloader" &&
         rebootARG=bootloader && rebootafter=true
 
-    echo $(mygrep_arg "Reboot after installing") | grep -q "recovery" &&
+    mygrep_arg "Reboot after installing" | grep -q "recovery" &&
         rebootARG=recovery && rebootafter=true
 
-    echo $(mygrep_arg "Safetynet fix") | grep -q "true" &&
+    mygrep_arg "Safetynet fix" | grep -q "true" &&
         safetyfix=true || safetyfix=false
 
-    echo $(mygrep_arg "Force Zygisk mode") | grep -q "true" &&
+    mygrep_arg "Force Zygisk mode" | grep -q "true" &&
         force_zygisk=true || force_zygisk=false
 
-    echo $(mygrep_arg "Add castom packages automatic in denylist") | grep -q "true" &&
+    mygrep_arg "Add castom packages automatic in denylist" | grep -q "true" &&
         add_deny_list=true || add_deny_list=false
 }
 
-shwo_arguments() {
+show_arguments() {
 
     $force_zygisk && ! $legacy_mode
     my_print ">>> Forced zygisk mode (DEFAULT)" "selected"

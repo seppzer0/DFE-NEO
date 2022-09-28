@@ -1,7 +1,8 @@
 #!/sbin/sh
+
 . $tmp/LNG/english.sh
 
-if (echo $(mygrep_arg "Force reading arguments.txt") | grep -q "true"); then
+if (mygrep_arg "Force reading arguments.txt" | grep -q "true"); then
     MYLNG=$(mygrep_arg "Language")
     [[ -f $tmp/LNG/${MYLNG}.sh ]] && . $tmp/LNG/${MYLNG}.sh || $tmp/LNG/english.sh
 elif [[ -z $LNGarg ]]; then
@@ -40,11 +41,15 @@ elif [[ -z $LNGarg ]]; then
 elif ! [[ -z $LNGarg ]]; then
     . $LNGarg
 fi
-if ! (echo $(mygrep_arg "Force reading arguments.txt") | grep -q "true"); then
-    if $my_magisk_installer && [[ -d /data/data/com.termux/ ]] && ! [[ $4 == termux ]]; then
-        my_print "Open Termux for further installation?"
-        MYSELECT "OPEN TERMUX" "CONTINUE IN MAGISK-APP" "More UI stability in TERMUX" "Less UI stability in MAGISK"
-        if [ $? = 1 ]; then
+if ! (mygrep_arg "Force reading arguments.txt" | grep -q "true"); then
+
+    if $my_magisk_installer && [ -d /data/data/com.termux/ ] && ! [ "$4" == "termux" ]; then
+        {
+            MYSELECT \
+                "Open Termux for further installation?" \
+                "OPEN TERMUX:select:YES:comment:More UI stability in TERMUX" \
+                "CONTINUE IN MAGISK-APP:select:NO:comment:Less UI stability in MAGISK"
+        } && {
             rm -f /data/data/com.termux/customize.sh /data/data/com.termux/install.zip
             unzip -o "$arg3" \
                 "customize.sh" \
@@ -58,7 +63,7 @@ if ! (echo $(mygrep_arg "Force reading arguments.txt") | grep -q "true"); then
             input text 'su -c sh /data/data/com.termux/customize.sh 1 2 "/data/data/com.termux/install.zip" "termux" "'${LNG_tmp}$LNGsell.sh'"'
             input keyevent KEYCODE_ENTER
             exit 0
-        fi
+        }
     fi
 fi
 
@@ -77,170 +82,140 @@ my_print "Model: $(getprop ro.product.model)"
 my_print "CPU architecture: $CPU"
 my_print "Detected active slot: $slot_ab"
 
-
-
-(MYSELECT \
-    "Hello, its my new function for select. you like it?" \
-    "Yeah, its very good:select:YES:comment:I think so" \
-    "Nope") && echo true || echo false
-
-
-
-
 read_argumetns_file
-if (echo $(mygrep_arg "Force reading arguments.txt") | grep -q "true"); then
+if (mygrep_arg "Force reading arguments.txt" | grep -q "true"); then
     first_select=2
 else
     ui_print " "
-    my_print "Do you want to use arguments.txt?"
     my_print "Parameters that are written in arguments.txt :"
-
+    reset_arguments
+    read_argumetns_file
+    show_arguments
     ui_print " "
     my_print "Volume up (+) for switching"
     my_print "Volume down (-) for select"
-
-    MYSELECT "Configure Arguments now" "Use arguments.txt"
-    #"DFE-method=$legacy_mode, Flash-Magisk=$Flash_Magisk, Hide-No-Encryption=$Hide_No_Encryption, Reflash-Recovery-for-OTA=$Reflash_Recovery_After_Oat, Reflash-current-Recovery=$Flash_Current_Rerovery, DISABLE-DYNAMIC-REFRESHRATE=$dynamic120hz, Wipe-DATA=$wipe_data, Remove-PIN=$rem_lock, Disable-QUOTA=$QUOTA_STAY, Disable-AVB=$AVB_STAY, Reboot-after-installing=${rebootafter}-$rebootARG, Safetynet-fix=$safetyfix, Force-Zygisk-mode=$force_zygisk, Add-castom-packages-automatic-in-denylist=$add_deny_list"
-    first_select=$?
+    {
+        MYSELECT \
+            "Do you want to use arguments.txt?" \
+            "Configure Arguments now" \
+            "Use arguments.txt"
+    } && first_select=1 || first_select=2
 fi
 case $first_select in
-2)
-    sleep 0.1
-
-    ;;
+2) sleep 0.1 ;;
 1)
+    reset_arguments
 
-    #twrp install "/sdcard/Download/miuipro_v12.0_alioth_22.7.14.zip"
-    my_print "Install DFE-NEO or DFE-Legacy?"
-    Flash_DFE=true
-    MYSELECT "DFE-NEO" "DFE-LEGACY" "The boot partition will be patched. RW rights are not necessary" "The vendor section will be patched or another section in which fstabs will be located. Need RW rights"
-    if [ $? = 2 ]; then
-        legacy_mode=true
-    else
-        legacy_mode=false
-    fi
-
-    my_print "Do you want to adjust the patching parameters of DFE QUOTA AVB?"
-    MYSELECT "DEFAULT" "YES"
-    if [ $? = 2 ]; then
-
-        my_print "Disable quota?"
-        MYSELECT "DISABLE QUOTA" "ENABLE QUOTA"
-        if [ $? = 1 ]; then
-            QUOTA_STAY=true
-        else
-            QUOTA_STAY=false
-        fi
-
-        my_print "Disable avb?"
-        MYSELECT "DISABLE AVB" "ENABLE AVB"
-        if [ $? = 1 ]; then
-            AVB_STAY=true
-        else
-            AVB_STAY=false
-        fi
-
-    else
+    {
+        MYSELECT \
+            "Install DFE-NEO or DFE-Legacy?" \
+            "Install NEO method:select:DFE-NEO:comment:The boot partition will be patched. RW rights are not necessary" \
+            "Install Legacy method:select:DFE-LEGACY:comment:The vendor section will be patched or another section in which fstabs will be located. Need RW rights"
+    } && legacy_mode=false || legacy_mode=true
+    {
+        MYSELECT \
+            "Do you want to adjust the patching parameters of DFE QUOTA AVB?" \
+            "DEFAULT" \
+            "YES"
+    } && {
         AVB_STAY=true
         QUOTA_STAY=true
-    fi
-
-    if $my_magisk_installer; then
-        my_print "Reflash recovery after OTA?"
-        MYSELECT "YES" "NO"
-        if [ $? = 1 ]; then
-            Reflash_Recovery_After_Oat=true
-        else
-            Reflash_Recovery_After_Oat=false
-        fi
-    else
-        my_print "Do you want to reinstall the current Recovery? The function works correctly only for devices, where RECOVERY is in BOOT"
-        MYSELECT "YES" "NO"
-        if [ $? = 1 ]; then
-            Flash_Current_Rerovery=true
-        else
-            Flash_Current_Rerovery=false
-        fi
-    fi
-
-    my_print "Do you want to install the built-in DFE-NEO Magisk v${MAGISK_VER}?"
-    MYSELECT "YES" "NO"
-    if [ $? = 1 ]; then
-        Flash_Magisk=true
-    else
-        Flash_Magisk=false
-    fi
-
-    my_print "Do you want to hide the disabled encryption of the device? For example, the device settings will show that your device is encrypted, but in fact it is decrypted"
-    MYSELECT "NOT HIDDEN" "HIDDEN" "The system will detect that your phone has been decrypted" "The system will display that your phone is encrypted. for more stability"
-    if [ $? = 2 ]; then
-        Hide_No_Encryption=true
-    else
-        Hide_No_Encryption=false
-    fi
-    my_print "Do you want to configure additional features?"
-    MYSELECT "YES" "NO"
-    if [ $? = 1 ]; then
-
-        my_print "Enable in-built DFE-NEO Safetynet fix?"
-        MYSELECT "ENABLE" "DISABLE"
-        if [ $? = 1 ]; then
-            safetyfix=true
-        else
-            safetyfix=false
-        fi
-
-        if $Flash_Magisk; then
-            my_print "Force to enable zygisk mode for magisk at system startup? After installing DFE-NEO, zygisk mode for magisk will be permanently enabled, to turn it off, you will need to flash DFE-NEO without this mode"
-            MYSELECT "YES" "NO"
-            if [ $? = 1 ]; then
-                force_zygisk=true
-            else
-                force_zygisk=false
-            fi
-        fi
-
-        my_print "Add custom packages/applications automatically to denylist after system boot? The zygisk mode must be enabled. Packages in denylist.txt : $(wc -l $tmp/denylist.txt | awk '{print $1}')"
-        MYSELECT "YES" "NO"
-        if [ $? = 1 ]; then
-            add_deny_list=true
-        else
-            add_deny_list=false
-        fi
-
-        my_print "Skip the mini tutorial on proper use after installation?"
-        MYSELECT "NOT SKIP" "SKIP"
-        if [ $? = 1 ]; then
-            skip_warning=false
-        else
-            skip_warning=true
-        fi
-
-        my_print "Do wipe data after successful installation?"
-        MYSELECT "DONT WIPE" "WIPE DATA" \
-            "If your device has already been decrypted and you are updating the ROM" \
-            "if your device is already decrypted and you change the ROM"
-        if [ $? = 1 ]; then
-            wipe_data=false
-        else
-            wipe_data=true
-
-        fi
-
-        if ! $wipe_data && [[ -f /data/system/locksettings.db ]] && ! $my_magisk_installer; then
-            my_print "Do you want to remove the lockscreen pin?"
-            MYSELECT "RETAIN TOUCH PIN" "REMOVE PIN"
-            if [ $? = 1 ]; then
-                rem_lock=false
-            else
-                rem_lock=true
-            fi
-        fi
-
-        my_print "Restart the device after a successful installation?"
-        MYSELECT4 "DONT RESTART" "SYSTEM" "RECOVERY" "BOOTLOADER/FASTBOOT"
+    } || {
+        {
+            MYSELECT \
+                "Disable QUOTA?" \
+                "NO" \
+                "YES"
+        } && QUOTA_STAY=false || QUOTA_STAY=true
+        {
+            MYSELECT \
+                "Disable AVB?" \
+                "NO" \
+                "YES"
+        } && AVB_STAY=false || AVB_STAY=true
+    }
+    $my_magisk_installer && {
+        {
+            MYSELECT \
+                "Reflash recovery after OTA?" \
+                "YES" \
+                "NO"
+        } && Reflash_Recovery_After_Oat=true || Reflash_Recovery_After_Oat=false
+    } || {
+        {
+            MYSELECT \
+                "Do you want to reinstall the current Recovery? The function works correctly only for devices, where RECOVERY is in BOOT" \
+                "YES" \
+                "NO"
+        } && Flash_Current_Rerovery=true || Flash_Current_Rerovery=false
+    }
+    {
+        MYSELECT \
+            "Do you want to install the built-in DFE-NEO Magisk v${MAGISK_VER}?" \
+            "YES" \
+            "NO"
+    } && Flash_Magisk=true || Flash_Magisk=false
+    {
+        MYSELECT \
+            "Do you want to hide the disabled encryption of the device? For example, the device settings will show that your device is encrypted, but in fact it is decrypted" \
+            "NOT HIDDEN:comment:The system will detect that your phone has been decrypted" \
+            "HIDDEN:comment:The system will display that your phone is encrypted. for more stability"
+    } && Hide_No_Encryption=false || Hide_No_Encryption=true
+    {
+        MYSELECT \
+            "Do you want to configure additional features?" \
+            "YES" \
+            "NO"
+    } && {
+        $Flash_Magisk && {
+            MYSELECT \
+                "Enable in-built DFE-NEO Safetynet fix?" \
+                "ENABLE:select:YES" \
+                "DISABLE:select:NO"
+        } && safetyfix=true || safetyfix=false
+        $Flash_Magisk && {
+            MYSELECT \
+                "Force to enable zygisk mode for magisk at system startup? After installing DFE-NEO, zygisk mode for magisk will be permanently enabled, to turn it off, you will need to flash DFE-NEO without this mode" \
+                "FORCE ENABLE ZYGISK:select:YES" \
+                "DISABLE FORCE ZYGISK:select:NO"
+        } && force_zygisk=true || force_zygisk=false
+        $Flash_Magisk && {
+            MYSELECT \
+                "Add custom packages/applications automatically to denylist after system boot? The zygisk mode must be enabled. Packages in denylist.txt : $(wc -l $tmp/denylist.txt | awk '{print $1}')" \
+                "ENABLE CUSTOM DENYLIST:select:YES" \
+                "NOT YET:select:NO"
+        } && add_deny_list=true || add_deny_list=false
+        {
+            MYSELECT \
+                "Skip the mini tutorial on proper use after installation?" \
+                "DONT SKIP:select:NO" \
+                "SKIP:select:YES"
+        } && skip_warning=false || skip_warning=true
+        {
+            MYSELECT \
+                "Do wipe data after successful installation?" \
+                "DONT WIPE:select:NO:comment:If your device has already been decrypted and you are updating the ROM" \
+                "WIPE DATA:select:YES:comment:if your device is already decrypted and you change the ROM"
+        } && wipe_data=false || wipe_data=true
+        (! $wipe_data && [ -f /data/system/locksettings.db ] && ! $my_magisk_installer) && {
+            MYSELECT \
+                "Do you want to remove the lockscreen pin?" \
+                "DONT TOUCH LOCKCREEN:select:NO" \
+                "REMOVE LOCKCREEN PIN:select:YES"
+        } && rem_lock=false || rem_lock=true
+        {
+            MYSELECT \
+                "Do you want to disable the dynamic refresh rate of the display? Only for MIUI" \
+                "DISABLE DYNAMIC REFRESH RATE:select:YES" \
+                "RETAIN DYNAMIC REFRESH RATE:select:NO"
+        } && dynamic120hz=true || dynamic120hz=false
+        MYSELECT \
+            "Restart the device after a successful installation?" \
+            "DONT RESTART:select:NO" \
+            "RESTART TO SYSTEM:select:SYSTEM" \
+            "RESTART TO RECOVERY:select:RECOVERY" \
+            "RESTART TO BOOTLOADER/FASTBOOT:select:BOOTLOADER/FASTBOOT"
         selectreturn=$?
-
         if [ $selectreturn = 1 ]; then
             rebootafter=false
         elif [ $selectreturn = 2 ]; then
@@ -256,30 +231,21 @@ case $first_select in
             rebootafter=false
             rebootARG=""
         fi
-
-        my_print "Do you want to disable the dynamic refresh rate of the display? Only for MIUI"
-        MYSELECT "DISABLE DYNAMIC REFRESH RATE" "RETAIN DYNAMIC REFRESH RATE"
-        if [ $? = 1 ]; then
-            dynamic120hz=true
-        else
-            dynamic120hz=false
-        fi
-    fi
-
+    }
     ;;
 esac
 
 if ! $Flash_Magisk &&
-    ! $Hide_No_Encryption &&
     ! $Flash_DFE &&
-    ! $Reflash_Recovery_After_Oat &&
     ! $Flash_Current_Rerovery; then
     my_abort 71
 fi
 
-
 timer_start2=$(date +%s%N)
+
 my_print "Starting the installation with these parameters:"
+
+show_arguments
 
 $force_zygisk && ! $legacy_mode || {
     sed -i 's|exec_background u:r:magisk:s0 root root --  ${MAGISKTMP}/init.dfe.sh ${MAGISKTMP} zygisk_on||g' "$tmp"/init.rc
@@ -301,9 +267,9 @@ $safetyfix || {
 }
 $AVB_STAY || {
     sed -i 's|echo "avb="|#echo "avb="|' "$tmp"/init.sh &&
-    sed -i 's|echo "avb_keys="|#echo "avb_keys="|' "$tmp"/init.sh &&
-    sed -i 's|echo "avb"|#echo "avb"|' "$tmp"/init.sh
+        sed -i 's|echo "avb_keys="|#echo "avb_keys="|' "$tmp"/init.sh &&
+        sed -i 's|echo "avb"|#echo "avb"|' "$tmp"/init.sh
 }
 $dynamic120hz && ! $legacy_mode || {
-        sed -i 's|#exec u:r:magisk:s0 root root --  ${MAGISKTMP}/init.dfe.sh ${MAGISKTMP} patch120dynamic|exec u:r:magisk:s0 root root --  ${MAGISKTMP}/init.dfe.sh ${MAGISKTMP} patch120dynamic|' "$tmp"/init.rc
+    sed -i 's|#exec u:r:magisk:s0 root root --  ${MAGISKTMP}/init.dfe.sh ${MAGISKTMP} patch120dynamic|exec u:r:magisk:s0 root root --  ${MAGISKTMP}/init.dfe.sh ${MAGISKTMP} patch120dynamic|' "$tmp"/init.rc
 }
