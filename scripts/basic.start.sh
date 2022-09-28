@@ -26,10 +26,9 @@ else
     mkdir -pv $tmp
     cp "$arg3" "$tmp/dfeneo.zip"
     arg3="$tmp/dfeneo.zip"
-    unzip -o "$arg3" \
-        "customize.sh" \
-        -j -d $tmp/ >>/dev/null
-    sh $tmp/customize.sh "$arg1" "$arg2" "$arg3"
+    unzip -o "$arg3" "customize.sh" -d "$tmp/" >>/dev/null
+    chmod 777 "$tmp"/customize.sh
+    sh "$tmp"/customize.sh "$arg1" "$arg2" "$arg3"
     exit $?
 fi
 exit 0

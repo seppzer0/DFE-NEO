@@ -1,7 +1,16 @@
 #!/sbin/sh
 my_print "Unpacking tools"
 
-# Magisk unpack
+
+
+mkdir -pv "$tmp"/my_BB
+
+unzip -o "$arg3" "tools/busybox.zip" -d "$tmp"/
+unzip -o "$tmp"/tools/busybox.zip -d "$tmp"/my_BB/
+
+
+
+
 
 unzip -o "$arg3" "arguments.txt" \
     "tools/magisklite.zip" \
