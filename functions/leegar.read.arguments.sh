@@ -1,57 +1,114 @@
 #!/sbin/sh
 
-read_argumetns_file(){
-echo $(mygrep_prop "Skip warnin" $tmp/arguments.txt) | grep -q "true" &&
-    skip_warning=true || skip_warning=false
+read_argumetns_file() {
+    echo $(mygrep_arg "Skip warnin") | grep -q "true" &&
+        skip_warning=true || skip_warning=false
 
-echo $(mygrep_prop "DFE method" $tmp/arguments.txt) | grep -q "legacy" &&
-    legacy_mode=true || legacy_mode=false
+    echo $(mygrep_arg "DFE method") | grep -q "legacy" &&
+        legacy_mode=true || legacy_mode=false
 
-echo $(mygrep_prop "Flash Magisk" $tmp/arguments.txt) | grep -q "true" &&
-    Flash_Magisk=true || Flash_Magisk=false
+    echo $(mygrep_arg "Flash Magisk") | grep -q "true" &&
+        Flash_Magisk=true || Flash_Magisk=false
 
-echo $(mygrep_prop "Hide No Encryption" $tmp/arguments.txt) | grep -q "true" &&
-    Hide_No_Encryption=true || Hide_No_Encryption=false
+    echo $(mygrep_arg "Hide No Encryption") | grep -q "true" &&
+        Hide_No_Encryption=true || Hide_No_Encryption=false
 
-echo $(mygrep_prop "Reflash Recovery for OTA" $tmp/arguments.txt) | grep -q "true" &&
-    Reflash_Recovery_After_Oat=true || Reflash_Recovery_After_Oat=false
+    echo $(mygrep_arg "Reflash Recovery for OTA") | grep -q "true" &&
+        Reflash_Recovery_After_Oat=true || Reflash_Recovery_After_Oat=false
 
-echo $(mygrep_prop "Reflash current Recovery for Recovery" $tmp/arguments.txt) | grep -q "true" &&
-    Flash_Current_Rerovery=true || Flash_Current_Rerovery=false
+    echo $(mygrep_arg "Reflash current Recovery for Recovery") | grep -q "true" &&
+        Flash_Current_Rerovery=true || Flash_Current_Rerovery=false
 
-echo $(mygrep_prop "Hide not encrypted" $tmp/arguments.txt) | grep -q "true" &&
-    Hide_No_Encryption=true || Hide_No_Encryption=false
+    echo $(mygrep_arg "Hide not encrypted") | grep -q "true" &&
+        Hide_No_Encryption=true || Hide_No_Encryption=false
 
-echo $(mygrep_prop "DISABLE DYNAMIC REFRESHRATE" $tmp/arguments.txt) | grep -q "true" &&
-    dynamic120hz=true || dynamic120hz=false
+    echo $(mygrep_arg "DISABLE DYNAMIC REFRESHRATE") | grep -q "true" &&
+        dynamic120hz=true || dynamic120hz=false
 
-echo $(mygrep_prop "Wipe DATA" $tmp/arguments.txt) | grep -q "true" &&
-    wipe_data=true || wipe_data=false
+    echo $(mygrep_arg "Wipe DATA") | grep -q "true" &&
+        wipe_data=true || wipe_data=false
 
-echo $(mygrep_prop "Remove PIN" $tmp/arguments.txt) | grep -q "true" &&
-    rem_lock=true || rem_lock=false
+    echo $(mygrep_arg "Remove PIN") | grep -q "true" &&
+        rem_lock=true || rem_lock=false
 
-echo $(mygrep_prop "Disable QUOTA" $tmp/arguments.txt) | grep -q "true" &&
-    QUOTA_STAY=true || QUOTA_STAY=false
+    echo $(mygrep_arg "Disable QUOTA") | grep -q "true" &&
+        QUOTA_STAY=true || QUOTA_STAY=false
 
-echo $(mygrep_prop "Disable AVB" $tmp/arguments.txt) | grep -q "true" &&
-    AVB_STAY=true || AVB_STAY=false
+    echo $(mygrep_arg "Disable AVB") | grep -q "true" &&
+        AVB_STAY=true || AVB_STAY=false
 
-echo $(mygrep_prop "Reboot after installing" $tmp/arguments.txt) | grep -q "system" &&
-    rebootARG=system && rebootafter=true
+    echo $(mygrep_arg "Reboot after installing") | grep -q "system" &&
+        rebootARG=system && rebootafter=true
 
-echo $(mygrep_prop "Reboot after installing" $tmp/arguments.txt) | grep -q "bootloader" &&
-    rebootARG=bootloader && rebootafter=true
+    echo $(mygrep_arg "Reboot after installing") | grep -q "bootloader" &&
+        rebootARG=bootloader && rebootafter=true
 
-echo $(mygrep_prop "Reboot after installing" $tmp/arguments.txt) | grep -q "recovery" &&
-    rebootARG=recovery && rebootafter=true
+    echo $(mygrep_arg "Reboot after installing") | grep -q "recovery" &&
+        rebootARG=recovery && rebootafter=true
 
-echo $(mygrep_prop "Safetynet fix" $tmp/arguments.txt) | grep -q "true" &&
-    safetyfix=true || safetyfix=false
+    echo $(mygrep_arg "Safetynet fix") | grep -q "true" &&
+        safetyfix=true || safetyfix=false
 
-echo $(mygrep_prop "Force Zygisk mode" $tmp/arguments.txt) | grep -q "true" &&
-    force_zygisk=true || force_zygisk=false
+    echo $(mygrep_arg "Force Zygisk mode") | grep -q "true" &&
+        force_zygisk=true || force_zygisk=false
 
-echo $(mygrep_prop "Add castom packages automatic in denylist" $tmp/arguments.txt) | grep -q "true" &&
-    add_deny_list=true || add_deny_list=false
+    echo $(mygrep_arg "Add castom packages automatic in denylist") | grep -q "true" &&
+        add_deny_list=true || add_deny_list=false
+}
+
+shwo_arguments() {
+
+    $force_zygisk && ! $legacy_mode
+    my_print ">>> Forced zygisk mode (DEFAULT)" "selected"
+    $add_deny_list && ! $legacy_mode &&
+        my_print ">>> Add apps to denylist automatically (DEFAULT)" "selected"
+    $Flash_DFE && ! $legacy_mode &&
+        my_print ">>> DFE-NEO (DEFAULT)" "selected"
+    $Flash_DFE && $legacy_mode &&
+        my_print ">>> DFE LEGACY (DEFAULT)" "selected"
+    $Flash_Magisk &&
+        my_print ">>> Flash Magisk (DEFAULT)" "selected"
+    $Hide_No_Encryption &&
+        my_print ">>> Hide not encrypted" "selected"
+    $Reflash_Recovery_After_Oat && $my_magisk_installer &&
+        my_print ">>> Reflash recovery after OTA" "selected"
+    $Flash_Current_Rerovery && ! $my_magisk_installer &&
+        my_print ">>> Reflash current Recovery" "selected"
+    $rem_lock && ! $my_magisk_installer &&
+        my_print ">>> Remove lock pin" "selected"
+    $wipe_data &&
+        my_print ">>> Wiping DATA" "selected"
+    $QUOTA_STAY &&
+        my_print ">>> Remove quota (DEFAULT)" "selected"
+    $safetyfix &&
+        my_print ">>> Safetynet fix (DEFAULT)" "selected"
+    $AVB_STAY &&
+        my_print ">>> Remove avb (DEFAULT)" "selected"
+    $rebootafter &&
+        my_print ">>> Reboot after install to: $rebootARG" "selected"
+    if $dynamic120hz && ! $legacy_mode; then
+        my_print ">>> Disable dynamic refresh rate" "selected"
+    fi
+}
+
+reset_arguments() {
+    rebootARG=""
+
+    wipe_data=false
+    rem_lock=false
+    skip_warning=false
+    dynamic120hz=false
+    rebootafter=false
+    Reflash_Recovery_After_Oat=false
+    Flash_Current_Rerovery=false
+    Hide_No_Encryption=false
+    legacy_mode=false
+
+    AVB_STAY=true
+    QUOTA_STAY=true
+    safetyfix=true
+    Flash_DFE=true
+    Flash_Magisk=true
+    add_deny_list=true
+    force_zygisk=true
 }

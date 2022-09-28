@@ -1,18 +1,15 @@
 #!/sbin/sh
 
-
+#SKIPUHNZIP=1
 timer_start1=$(date +%s%N)
 LNGarg="$5"
-#exit 1
-DFENV="1.5.3.014 BETA"
-#SKIPUHNZIP=1
-
+DFENV="1.5.3.014-BETA"
+A_only=false
 tmp="/dev/dfe-neo"
+my_log="$tmp/log.neo-installer.$DFENV.txt"
 sysboot=$(getprop sys.boot_completed)
 CPU=$(getprop ro.product.cpu.abi)
-rem_lock=false
 # TWRP or Magisk check
-
 [ -f /data/adb/modules_update/DFENEO/customize.sh ] && rm -rf /data/adb/modules_update/DFENEO
 [ -f /data/adb/modules/DFENEO/customize.sh ] && rm -rf /data/adb/modules/DFENEO
 if [ "$sysboot" = 1 ]; then
@@ -37,23 +34,12 @@ else
     
     ui_print() { echo -e "ui_print "$1"\nui_print" >>"/proc/self/fd/$arg2"; }
 fi
-my_log="$tmp/log.neo-installer.txt"
-wipe_data=false
-rebootafter=false
-A_only=false
-skip_warning=false
-dynamic120hz=false
-rebootafter=false
-    AVB_STAY=false
-    QUOTA_STAY=false
-safetyfix=true
-add_deny_list=true
-force_zygisk=true
+
 
 # Create tmp folder
 
 rm -rf $tmp
-mkdir -pv $tmp &>$(dirname $arg3)/log.txt
+mkdir -pv $tmp &>$$my_log
 
 # CPU and slot check
 

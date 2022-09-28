@@ -1,4 +1,47 @@
 #!/sbin/sh
+
+
+if $legacy_mode && $Flash_DFE; then
+    stop_dfe=false
+    for file in /data/gsi/ota/*.img; do
+        [[ -f $file ]] && stop_dfe=true
+    done
+    $stop_dfe && my_abort "98" "Cant mount partition, please reboot recovery or try neo method"
+
+    mount_part --mount
+    if ! $my_magisk_installer && ! (mountpoint -q /vendor) && ! (mountpoint -q /system_root); then
+        my_abort "88" "$text75"
+    fi
+    for file in $(find $($my_magisk_installer && echo /system || echo /system_root) /system_ext /odm /product /vendor -name "*fstab*"); do
+        if (grep -q "/userdata" $file) && (grep -q "/metadata" $file); then
+            rw_part_check "$(dirname "$file")" || my_abort "74" "Your system have RO status, please use MakeRW or SystemRW or use neo method"
+        fi
+    done
+    for file in $(find $($my_magisk_installer && echo /system || echo /system_root) /system_ext /odm /product /vendor -name "*fstab*"); do
+        if (grep -q "/userdata" $file) && (grep -q "/metadata" $file); then
+            DFE "$file"
+            my_print "$(basename $file) successfully patched"
+        fi
+    done
+    if $Hide_No_Encryption; then
+        if ! $my_magisk_installer && (rw_part_check "/system_root/system"); then
+            (grep -q "ro.crypto.state" /system_root/system/build.prop &&
+                sed -i '/ro.crypto.state/d' /system_root/system/build.prop &&
+                echo "ro.crypto.state=encrypted" >>/system_root/system/build.prop) ||
+                echo "ro.crypto.state=encrypted" >>/system_root/system/build.prop
+        elif $my_magisk_installer && (rw_part_check "/system"); then
+            (grep -q "ro.crypto.state" /system/build.prop &&
+                sed -i '/ro.crypto.state/d' /system/build.prop &&
+                echo "ro.crypto.state=encrypted" >>/system/build.prop) ||
+                echo "ro.crypto.state=encrypted" >>/system/build.prop
+        fi
+    fi
+fi
+
+
+
+
+
 ui_print " "
 for forslot in $(
     if $A_only; then

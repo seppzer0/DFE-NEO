@@ -1,97 +1,50 @@
 #!/bin/sh
-MYSELECT4() {
-    my_print "> [$1]" "selected"
-    my_print "> [$2]" "selected"
-    my_print "> [$3]" "selected"
-    my_print "> [$4]" "selected"
-    my_print "> [$text4] " "selected"
-    ui_print " "
-    A=1
-    while true; do
-        case $A in
-        1)
-            TEXT="$1"
-            outselect=1
-            ;;
-        2)
-            TEXT="$2"
-            outselect=2
-            ;;
-        3)
-            TEXT="$3"
-            outselect=3
-            ;;
-        4)
-            TEXT="$4"
-            outselect=4
-            ;;
-        5)
-            TEXT="$text4"
-            outselect=5
-            ;;
-        esac
-
-        my_print " > $TEXT <" "selected"
-        if chooseport 60; then
-            A=$((A + 1))
-        else
-            break
-        fi
-        if [ $A -gt 5 ]; then
-            A=1
-        fi
-    done
-    if [ $outselect = 5 ]; then
-        my_abort "1"
-    fi
-
-    my_print " >[$TEXT]<" "selected"
-    ui_print " "
-    ui_print "****==================================*****"
-    return $outselect
-}
-
 MYSELECT() {
-    my_print "> [$1]" "selected"
-    ! [ -z "$3" ] && my_print "$3"
-    my_print "> [$2]" "selected"
-    ! [ -z "$4" ] && my_print "$4"
-    my_print "> [$text4]" "selected"
-    ui_print " "
-    A=1
-    while true; do
-        case $A in
-        1)
-            TEXT="$1"
-            outselect=1
-            ;;
-        2)
-            TEXT="$2"
-            outselect=2
-            ;;
-        3)
-            TEXT="$text4"
-            outselect=3
-            ;;
-            #4 ) TEXT="EXIT" ; outselect=4 ;;
-        esac
+    ui_print ""
+    [ -z "$1" ] || my_print "$1"
+    ui_print ""
+    tick_for=1
+    for text in "${2}" "${3}" "${4}" "${5}" "${6}" "${7}" "${8}" "${9}" "${10}" "${11}" "${12}" "${13}" "${14}" "${15}"; do
+        [ -z "$text" ] && break
+        text_input=${text%:comment:*}
+        text_select=${text_input#*:select:}
+        text_input=${text_input%:select:*}
+        text_commend=${text#*:comment:}
 
-        my_print " > $TEXT <" "selected"
+        my_print "${tick_for}) [$text_input]" "selected"
+        (echo $text | grep -q ':comment:') && my_print "--${text_commend}--" "selected"
+        [ -z "$text_for_select" ] &&
+            text_for_select="${tick_for}) $text_select" ||
+            text_for_select="${text_for_select}\n${tick_for}) ${text_select}"
+        tick_for=$((tick_for + 1))
+    done
+
+    text_for_select="${text_for_select}\n${text4}"
+
+    tick_select=1
+    all_ticks=$(echo -e $text_for_select | wc -l)
+    while true; do
+        my_print " > $(echo -e $text_for_select | head -n$tick_select | tail -n1) <" "selected"
         if chooseport 60; then
-            A=$((A + 1))
+            tick_select=$((tick_select + 1))
         else
             break
         fi
-        if [ $A -gt 3 ]; then
-            A=1
+        if [ $tick_select -gt $all_ticks ]; then
+            tick_select=1
         fi
     done
-    if [ $outselect = 3 ]; then
+    my_print " >[$(echo -e $text_for_select | head -n$tick_select | tail -n1)]<" "selected"
+    ui_print " "
+    ui_print "**==================================***"
+    if [ "$(echo -e $text_for_select | head -n$tick_select | tail -n1)" = "${text4}" ]; then
         my_abort "1"
     fi
-
-    my_print " >[$TEXT]<" "selected"
-    ui_print " "
-    ui_print "****==================================*****"
-    return $outselect
+    if [ $all_ticks -le 3 ]; then
+        [ $tick_select = 1 ] && return 0
+        [ $tick_select = 2 ] && return 1
+    else
+        return $tick_select
+    fi
 }
+
