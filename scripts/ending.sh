@@ -1,4 +1,4 @@
-
+#!/sbin/sh
 if $rem_lock && ! $my_magisk_installer; then
     my_print "$text86"
     rm -f /data/system/locksettings*

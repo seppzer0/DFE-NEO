@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/sbin/sh
 my_abort() {
     error_code="$1"
     error_text="$2"

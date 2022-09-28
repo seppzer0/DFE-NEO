@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/sbin/sh
 MYSELECT() {
     ui_print ""
     [ -z "$1" ] || my_print "$1"

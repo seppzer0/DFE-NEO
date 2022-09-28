@@ -1,7 +1,5 @@
 #!/sbin/sh
-
 . $tmp/LNG/english.sh
-
 if (mygrep_arg "Force reading arguments.txt" | grep -q "true"); then
     MYLNG=$(mygrep_arg "Language")
     [[ -f $tmp/LNG/${MYLNG}.sh ]] && . $tmp/LNG/${MYLNG}.sh || $tmp/LNG/english.sh

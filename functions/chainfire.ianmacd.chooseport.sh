@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/sbin/sh
 chooseport() {
     # Original idea by chainfire and ianmacd @xda-developers
     [ "$1" ] && local delay=$1 || local delay=3
