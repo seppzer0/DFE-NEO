@@ -7,7 +7,6 @@ LNGarg="$5"
 DFENV="1.5.3.014 BETA"
 #SKIPUHNZIP=1
 
-#(mountpoint -q /data/) && tmp="/data/local/tmp-dfe-neo" ||
 tmp="/dev/dfe-neo"
 sysboot=$(getprop sys.boot_completed)
 CPU=$(getprop ro.product.cpu.abi)
@@ -35,9 +34,10 @@ else
     arg3="$3"
     my_magisk_installer=false
     type flash_image || flash_image() { dd if="$1" of="$2"; }
+    
     ui_print() { echo -e "ui_print "$1"\nui_print" >>"/proc/self/fd/$arg2"; }
 fi
-
+my_log="$tmp/log.neo-installer.txt"
 wipe_data=false
 rebootafter=false
 A_only=false
@@ -50,8 +50,3 @@ mkdir -pv $tmp &>$(dirname $arg3)/log.txt
 # CPU and slot check
 
 [ -z "$CPU" ] && my_abort 77
-case $CPU in
-arm*) cpukey=arm ;;
-x86*) cpukey=x86 ;;
-esac
-#sleep 1
