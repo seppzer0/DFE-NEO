@@ -1,3 +1,4 @@
+#!/sbin/sh
 ui_print " "
 for forslot in $(
     if $A_only; then
@@ -14,7 +15,7 @@ for forslot in $(
         mkdir $tmp/current_boot$forslot
         tmp_boot=$tmp/current_boot$forslot
         ! $my_magisk_installer && mount_part --umount
- 
+
         if [[ $forslot == "A_only" ]]; then
             BOOTIMAGE=
             if $RECOVERYMODE; then
@@ -38,19 +39,19 @@ for forslot in $(
         [[ -z $boot ]] && my_abort 4
         cd $tmp_boot
         magiskboot unpack -h $boot &>$(dirname $arg3)/log.txt
-        
-        magiskboot cpio ramdisk.cpio "exists overlay.d/sbin/my_mg_64" && \
-        magiskboot cpio ramdisk.cpio "rm overlay.d/sbin/my_mg_64"
-        magiskboot cpio ramdisk.cpio "exists overlay.d/sbin/my_mg_32" && \
-        magiskboot cpio ramdisk.cpio "rm overlay.d/sbin/my_mg_32"
-        magiskboot cpio ramdisk.cpio "exists overlay.d/sbin/init.dfe.sh" && \
-        magiskboot cpio ramdisk.cpio "rm overlay.d/sbin/init.dfe.sh"
-        magiskboot cpio ramdisk.cpio "exists overlay.d/init.dfe.rc" && \
-        magiskboot cpio ramdisk.cpio "rm overlay.d/init.dfe.rc"
-        magiskboot cpio ramdisk.cpio "exists overlay.d/sbin/dfe_neo_support_binary" && \
-        magiskboot cpio ramdisk.cpio "rm overlay.d/sbin/dfe_neo_support_binary"
-        magiskboot cpio ramdisk.cpio "exists overlay.d/sbin/dfe.neo.magisk.lib.txt" && \
-        magiskboot cpio ramdisk.cpio "rm overlay.d/sbin/dfe.neo.magisk.lib.txt"
+
+        magiskboot cpio ramdisk.cpio "exists overlay.d/sbin/my_mg_64" &&
+            magiskboot cpio ramdisk.cpio "rm overlay.d/sbin/my_mg_64"
+        magiskboot cpio ramdisk.cpio "exists overlay.d/sbin/my_mg_32" &&
+            magiskboot cpio ramdisk.cpio "rm overlay.d/sbin/my_mg_32"
+        magiskboot cpio ramdisk.cpio "exists overlay.d/sbin/init.dfe.sh" &&
+            magiskboot cpio ramdisk.cpio "rm overlay.d/sbin/init.dfe.sh"
+        magiskboot cpio ramdisk.cpio "exists overlay.d/init.dfe.rc" &&
+            magiskboot cpio ramdisk.cpio "rm overlay.d/init.dfe.rc"
+        magiskboot cpio ramdisk.cpio "exists overlay.d/sbin/dfe_neo_support_binary" &&
+            magiskboot cpio ramdisk.cpio "rm overlay.d/sbin/dfe_neo_support_binary"
+        magiskboot cpio ramdisk.cpio "exists overlay.d/sbin/dfe.neo.magisk.lib.txt" &&
+            magiskboot cpio ramdisk.cpio "rm overlay.d/sbin/dfe.neo.magisk.lib.txt"
 
         if $Flash_Current_Rerovery && ! $my_magisk_installer && ! [ $forslot = "A_only" ]; then
             ! $my_magisk_installer && mount_part --umount
@@ -80,7 +81,7 @@ for forslot in $(
             if [[ $forslot == $not_slot_ab ]]; then
                 mkdir -pv $tmp/recovery$slot_ab &>$(dirname $arg3)/log.txt
                 cd $tmp/recovery$slot_ab || my_abort "3"
-                magiskboot unpack -h /dev/block/by-name/boot$slot_ab &>$(dirname $arg3)/log.txt               
+                magiskboot unpack -h /dev/block/by-name/boot$slot_ab &>$(dirname $arg3)/log.txt
                 rm -f $tmp_boot/ramdisk.cpio
 
                 mv \
@@ -135,51 +136,51 @@ for forslot in $(
             1)
                 my_print "$text80 $($A_only || echo $text78 $forslot)"
                 my_print "$text81 ($(basename $boot)) $($A_only || echo $text78 $forslot)"
-                magiskboot cpio ramdisk.cpio "exists overlay.d/sbin/magisk64.xz" && \
-                echo magisk64 >> dfe.neo.magisk.lib.txt
-                magiskboot cpio ramdisk.cpio "exists overlay.d/sbin/magisk64.xz" && \
-                echo magisk32 >> dfe.neo.magisk.lib.txt
+                magiskboot cpio ramdisk.cpio "exists overlay.d/sbin/magisk64.xz" &&
+                    echo magisk64 >>dfe.neo.magisk.lib.txt
+                magiskboot cpio ramdisk.cpio "exists overlay.d/sbin/magisk64.xz" &&
+                    echo magisk32 >>dfe.neo.magisk.lib.txt
                 ;;
             0)
                 my_print "$text82 $($A_only || echo $text78 $forslot)"
                 my_print "$text83 $($A_only || echo $text78 $forslot)"
-                            cp $MAGISKBIN/* $tmp_boot/
-            chmod -R 755 $tmp_boot
-            BOOTIMAGE=$boot
-            cd $tmp_boot
-            sed -i 's|cd|#cd|' $tmp_boot/boot_patch.sh
-            sed -i 's|./magiskboot unpack|#./magiskboot unpack|' $tmp_boot/boot_patch.sh
-            sed -i 's|./magiskboot repack|#./magiskboot repack|' $tmp_boot/boot_patch.sh
-            if [ ! -c $BOOTIMAGE ]; then
-                eval $BOOTSIGNER -verify <$BOOTIMAGE && BOOTSIGNED=true
-                $BOOTSIGNED && ui_print "- Boot image is signed with AVB 1.0"
-            fi
+                cp $MAGISKBIN/* $tmp_boot/
+                chmod -R 755 $tmp_boot
+                BOOTIMAGE=$boot
+                cd $tmp_boot
+                sed -i 's|cd|#cd|' $tmp_boot/boot_patch.sh
+                sed -i 's|./magiskboot unpack|#./magiskboot unpack|' $tmp_boot/boot_patch.sh
+                sed -i 's|./magiskboot repack|#./magiskboot repack|' $tmp_boot/boot_patch.sh
+                if [ ! -c $BOOTIMAGE ]; then
+                    eval $BOOTSIGNER -verify <$BOOTIMAGE && BOOTSIGNED=true
+                    $BOOTSIGNED && ui_print "- Boot image is signed with AVB 1.0"
+                fi
 
-            # Source the boot patcher
-            SOURCEDMODE=true
-            . ./boot_patch.sh "$BOOTIMAGE" &>$(dirname $arg3)/log.txt
-            case $? in
-            1)
-                abort "! Insufficient partition size"
-                ;;
-            2)
-                abort "! $BOOTIMAGE is read only"
-                ;;
-            esac
-            run_migrations &>$(dirname $arg3)/log.txt
+                # Source the boot patcher
+                SOURCEDMODE=true
+                . ./boot_patch.sh "$BOOTIMAGE" &>$(dirname $arg3)/log.txt
+                case $? in
+                1)
+                    abort "! Insufficient partition size"
+                    ;;
+                2)
+                    abort "! $BOOTIMAGE is read only"
+                    ;;
+                esac
+                run_migrations &>$(dirname $arg3)/log.txt
                 cd $tmp_boot || my_abort "3"
                 my_print "$text85 ($(basename $boot)) $($A_only || echo $text78 $forslot)"
-                if ( magiskboot cpio ramdisk.cpio "exists overlay.d/sbin/magisk64.xz" ) ; then
-                magiskboot cpio ramdisk.cpio "extract overlay.d/sbin/magisk64.xz 64.xz"
-                magiskboot decompress 64.xz my_mg_64
-                echo magisk64 >> dfe.neo.magisk.lib.txt
-                magiskboot cpio ramdisk.cpio "add 0750 overlay.d/sbin/my_mg_64 my_mg_64"
+                if (magiskboot cpio ramdisk.cpio "exists overlay.d/sbin/magisk64.xz"); then
+                    magiskboot cpio ramdisk.cpio "extract overlay.d/sbin/magisk64.xz 64.xz"
+                    magiskboot decompress 64.xz my_mg_64
+                    echo magisk64 >>dfe.neo.magisk.lib.txt
+                    magiskboot cpio ramdisk.cpio "add 0750 overlay.d/sbin/my_mg_64 my_mg_64"
                 fi
-                if ( magiskboot cpio ramdisk.cpio "exists overlay.d/sbin/magisk32.xz" ) ; then
-                magiskboot cpio ramdisk.cpio "extract overlay.d/sbin/magisk32.xz 32.xz"
-                magiskboot decompress 32.xz my_mg_32
-                echo magisk32 >> dfe.neo.magisk.lib.txt
-                magiskboot cpio ramdisk.cpio "add 0750 overlay.d/sbin/my_mg_32 my_mg_32"
+                if (magiskboot cpio ramdisk.cpio "exists overlay.d/sbin/magisk32.xz"); then
+                    magiskboot cpio ramdisk.cpio "extract overlay.d/sbin/magisk32.xz 32.xz"
+                    magiskboot decompress 32.xz my_mg_32
+                    echo magisk32 >>dfe.neo.magisk.lib.txt
+                    magiskboot cpio ramdisk.cpio "add 0750 overlay.d/sbin/my_mg_32 my_mg_32"
                 fi
                 magiskboot cpio ramdisk.cpio \
                     "rm overlay.d/sbin/magisk64.xz" \
@@ -189,9 +190,9 @@ for forslot in $(
             esac
             cd $tmp_boot
             unzip -o "$tmp/magisklite.zip" \
-    "lib/$CPU/libmagisk64.so" -j -d $tmp_boot &>$(dirname $arg3)/log.txt
-    unzip -o "$tmp/magisklite.zip" \
-    "lib/$CPU/libmagisk32.so" -j -d $tmp_boot &>$(dirname $arg3)/log.txt
+                "lib/$CPU/libmagisk64.so" -j -d $tmp_boot &>$(dirname $arg3)/log.txt
+            unzip -o "$tmp/magisklite.zip" \
+                "lib/$CPU/libmagisk32.so" -j -d $tmp_boot &>$(dirname $arg3)/log.txt
             [ -f $tmp_boot/libmagisk64.so ] && inject_my_magisk=$tmp_boot/libmagisk64.so
             [ -f $tmp_boot/libmagisk32.so ] && inject_my_magisk=$tmp_boot/libmagisk32.so
             magiskboot cpio ramdisk.cpio "exists .backup/.magisk" &>$(dirname $arg3)/log.txt &&
@@ -210,14 +211,14 @@ for forslot in $(
                 "add 0750 overlay.d/init.dfe.rc $tmp/init.rc" \
                 "add 000 .backup/.magisk fconfig" &>$(dirname $arg3)/log.txt
         fi
-     cd $tmp_boot
-     my_print "$text113 ($(basename $boot)) $($A_only || echo $text78 $forslot)"
-            magiskboot repack $boot &>$(dirname $arg3)/log.txt
-            my_print "$text114 ($(basename $boot)) $($A_only || echo $text78 $forslot)"
-            flash_image ./new-boot.img $boot
-            #cp ./new-boot.img /sdcard/boot$forslot.img
-            rm -f ./new-boot.img ./kernel ./header ./ramdisk.cpio
-            cd $tmp
+        cd $tmp_boot
+        my_print "$text113 ($(basename $boot)) $($A_only || echo $text78 $forslot)"
+        magiskboot repack $boot &>$(dirname $arg3)/log.txt
+        my_print "$text114 ($(basename $boot)) $($A_only || echo $text78 $forslot)"
+        flash_image ./new-boot.img $boot
+        #cp ./new-boot.img /sdcard/boot$forslot.img
+        rm -f ./new-boot.img ./kernel ./header ./ramdisk.cpio
+        cd $tmp
     } &
 done
 wait

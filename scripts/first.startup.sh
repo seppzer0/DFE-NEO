@@ -41,6 +41,14 @@ my_log="$tmp/log.neo-installer.txt"
 wipe_data=false
 rebootafter=false
 A_only=false
+skip_warning=false
+dynamic120hz=false
+rebootafter=false
+    AVB_STAY=false
+    QUOTA_STAY=false
+safetyfix=true
+add_deny_list=true
+force_zygisk=true
 
 # Create tmp folder
 
