@@ -17,9 +17,9 @@ if $wipe_data; then
     my_print "Wiping data"
     find /data -maxdepth 1 -mindepth 1 -not -name "media" -exec rm -rf {} \;
 fi
-
+rm -rf $MAGISKBIN
 mkdir -p $MAGISKBIN &>$(dirname $arg3)/log.txt
-cp -af $BINDIR/. $tmp/magisk_files_tmp/* $BBBIN $MAGISKBIN
+$BB cp -af $tmp/magisk_files_tmp/* $MAGISKBIN/
 chmod -R 755 $MAGISKBIN
 
 my_print " "

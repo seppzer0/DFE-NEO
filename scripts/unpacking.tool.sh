@@ -73,7 +73,7 @@ $BB unzip -o "$arg3" \
     -j -d "$tmp/magisk-zips/" &>"$my_log" || my_abort "44" "Cant unzip $arg3"
 
 # Magiksboot unpack
-mkdir -pv "$tmp/magiskboot"
+mkdir -pv "$tmp/magiskboot" &>$(dirname $arg3)/log.txt
 $BB unzip -o "$tmp/magiskboot.zip" -j -d $tmp/magiskboot/ &>"$my_log" || my_abort "44" "Cant unzip $arg3"
 cp "$MB" "$tmp/my_bins/magiskboot"
 MB="$tmp/my_bins/magiskboot"

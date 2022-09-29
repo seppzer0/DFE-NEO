@@ -77,7 +77,7 @@ for forslot in $(
     fi
 ); do
     {
-        mkdir $tmp/current_boot$forslot
+        mkdir $tmp/current_boot$forslot &>$(dirname $arg3)/log.txt
         tmp_boot=$tmp/current_boot$forslot
         ! $my_magisk_installer && mount_part --umount
 
@@ -101,13 +101,13 @@ for forslot in $(
         boot=$BOOTIMAGE
         [[ -z $boot ]] && my_abort 4
         cd $tmp_boot
-        $MB unpack -h $boot &>$(dirname $arg3)/log.txt
-        $MB cpio ramdisk.cpio "exists overlay.d/sbin/my_mg_64" && $MB cpio ramdisk.cpio "rm overlay.d/sbin/my_mg_64"
-        $MB cpio ramdisk.cpio "exists overlay.d/sbin/my_mg_32" && $MB cpio ramdisk.cpio "rm overlay.d/sbin/my_mg_32"
-        $MB cpio ramdisk.cpio "exists overlay.d/sbin/init.dfe.sh" && $MB cpio ramdisk.cpio "rm overlay.d/sbin/init.dfe.sh"
-        $MB cpio ramdisk.cpio "exists overlay.d/init.dfe.rc" && $MB cpio ramdisk.cpio "rm overlay.d/init.dfe.rc"
-        $MB cpio ramdisk.cpio "exists overlay.d/init.add.rc" && $MB cpio ramdisk.cpio "rm overlay.d/init.add.rc"
-        $MB cpio ramdisk.cpio "exists overlay.d/sbin/dfe_neo_support_binary" && $MB cpio ramdisk.cpio "rm overlay.d/sbin/dfe_neo_support_binary"
+        $MB unpack -h $boot &>"$my_log"
+        $MB cpio ramdisk.cpio "exists overlay.d/sbin/my_mg_64" &>"$my_log" && $MB cpio ramdisk.cpio "rm overlay.d/sbin/my_mg_64" &>"$my_log"
+        $MB cpio ramdisk.cpio "exists overlay.d/sbin/my_mg_32" &>"$my_log" && $MB cpio ramdisk.cpio "rm overlay.d/sbin/my_mg_32" &>"$my_log"
+        $MB cpio ramdisk.cpio "exists overlay.d/sbin/init.dfe.sh" &>"$my_log" && $MB cpio ramdisk.cpio "rm overlay.d/sbin/init.dfe.sh" &>"$my_log"
+        $MB cpio ramdisk.cpio "exists overlay.d/init.dfe.rc" &>"$my_log" && $MB cpio ramdisk.cpio "rm overlay.d/init.dfe.rc" &>"$my_log"
+        $MB cpio ramdisk.cpio "exists overlay.d/init.add.rc" &>"$my_log" && $MB cpio ramdisk.cpio "rm overlay.d/init.add.rc" &>"$my_log"
+        $MB cpio ramdisk.cpio "exists overlay.d/sbin/dfe_neo_support_binary" &>"$my_log" && $MB cpio ramdisk.cpio "rm overlay.d/sbin/dfe_neo_support_binary" &>"$my_log"
 
         if $Flash_Current_Rerovery && ! $my_magisk_installer && ! [ $forslot = "A_only" ]; then
             ! $my_magisk_installer && mount_part --umount
@@ -128,9 +128,9 @@ for forslot in $(
 
         if $Reflash_Recovery_After_Oat && $my_magisk_installer && ! [ $forslot = "A_only" ]; then
             if [[ $forslot == $not_slot_ab ]]; then
-                mkdir -pv $tmp/recovery$slot_ab &>$(dirname $arg3)/log.txt
+                mkdir -pv $tmp/recovery$slot_ab &>"$my_log"
                 cd $tmp/recovery$slot_ab || my_abort "3"
-                $MB unpack -h /dev/block/by-name/boot$slot_ab &>$(dirname $arg3)/log.txt
+                $MB unpack -h /dev/block/by-name/boot$slot_ab &>"$my_log"
                 rm -f $tmp_boot/ramdisk.cpio
                 mv $tmp/recovery$slot_ab/ramdisk.cpio $tmp_boot/ramdisk.cpio
                 cd $tmp || my_abort "3"
@@ -139,7 +139,7 @@ for forslot in $(
 
         if $Flash_Magisk; then
 
-            cp $BINDIR/* $tmp_boot/
+            cp -af $BINDIR/* $tmp_boot/
             chmod -R 755 $tmp_boot
 
             my_print "$text77$MAGISK_VER $($A_only || echo $text78 $forslot)"
@@ -157,23 +157,23 @@ for forslot in $(
 
             # Source the boot patcher
             SOURCEDMODE=true
-            . ./boot_patch.sh "$BOOTIMAGE" &>$(dirname $arg3)/log.txt
+            . ./boot_patch.sh "$BOOTIMAGE" &>"$my_log"
             case $? in
             1) abort "! Insufficient partition size" ;;
             2) abort "! $BOOTIMAGE is read only" ;;
             esac
-            run_migrations &>$(dirname $arg3)/log.txt
+            run_migrations &>"$my_log"
             cd $tmp || my_abort "3"
         fi
 
         if $Flash_DFE && ! $legacy_mode; then
             my_print "$text79 ($(basename $boot)) $($A_only || echo $text78 $forslot)"
             cd $tmp_boot || my_abort "3"
-            $MB cpio ramdisk.cpio test &>$(dirname $arg3)/log.txt
+            $MB cpio ramdisk.cpio test &>"$my_log"
             STATUSM=$?
             if [ "$STATUSM" = "0" ] ||
-                ( ! ($MB cpio ramdisk.cpio "exists overlay.d/sbin/magisk64.xz" &>$(dirname $arg3)/log.txt) ||
-                    ! ($MB cpio ramdisk.cpio "exists overlay.d/sbin/magisk32.xz" &>$(dirname $arg3)/log.txt)); then
+                ( ! ($MB cpio ramdisk.cpio "exists overlay.d/sbin/magisk64.xz" &>"$my_log") ||
+                    ! ($MB cpio ramdisk.cpio "exists overlay.d/sbin/magisk32.xz" &>"$my_log")); then
                 STATUSM=0
             fi
             case $STATUSM in
@@ -184,7 +184,7 @@ for forslot in $(
             0)
                 my_print "$text82 $($A_only || echo $text78 $forslot)"
                 my_print "$text83 $($A_only || echo $text78 $forslot)"
-                cp $BINDIR/* $tmp_boot/
+                cp -af $BINDIR/* $tmp_boot/
                 chmod -R 755 $tmp_boot
                 BOOTIMAGE=$boot
                 cd $tmp_boot
@@ -206,34 +206,34 @@ for forslot in $(
                 run_migrations &>$(dirname $arg3)/log.txt
                 cd $tmp_boot || my_abort "3"
                 my_print "$text85 ($(basename $boot)) $($A_only || echo $text78 $forslot)"
-                if ($MB cpio ramdisk.cpio "exists overlay.d/sbin/magisk64.xz"); then
-                    $MB cpio ramdisk.cpio "extract overlay.d/sbin/magisk64.xz 64.xz"
-                    $MB decompress 64.xz my_mg_64
-                    $MB cpio ramdisk.cpio "add 0750 overlay.d/sbin/my_mg_64 my_mg_64"
+                if ($MB cpio ramdisk.cpio "exists overlay.d/sbin/magisk64.xz" &>"$my_log"); then
+                    $MB cpio ramdisk.cpio "extract overlay.d/sbin/magisk64.xz 64.xz" &>"$my_log"
+                    $MB decompress 64.xz my_mg_64 &>"$my_log"
+                    $MB cpio ramdisk.cpio "add 0750 overlay.d/sbin/my_mg_64 my_mg_64" &>"$my_log"
                 fi
-                if ($MB cpio ramdisk.cpio "exists overlay.d/sbin/magisk32.xz"); then
-                    $MB cpio ramdisk.cpio "extract overlay.d/sbin/magisk32.xz 32.xz"
-                    $MB decompress 32.xz my_mg_32
-                    $MB cpio ramdisk.cpio "add 0750 overlay.d/sbin/my_mg_32 my_mg_32"
+                if ($MB cpio ramdisk.cpio "exists overlay.d/sbin/magisk32.xz" &>"$my_log"); then
+                    $MB cpio ramdisk.cpio "extract overlay.d/sbin/magisk32.xz 32.xz" &>"$my_log"
+                    $MB decompress 32.xz my_mg_32 &>"$my_log"
+                    $MB cpio ramdisk.cpio "add 0750 overlay.d/sbin/my_mg_32 my_mg_32" &>"$my_log"
                 fi
                 $MB cpio ramdisk.cpio \
                     "rm overlay.d/sbin/magisk64.xz" \
-                    "rm overlay.d/sbin/magisk32.xz" &>$(dirname $arg3)/log.txt
+                    "rm overlay.d/sbin/magisk32.xz" &>"$my_log"
 
                 ;;
             esac
             cd $tmp_boot
-            $MB cpio ramdisk.cpio "add 0750 overlay.d/init.dfe.rc $tmp/init.dfe.rc"
+            $MB cpio ramdisk.cpio "add 0750 overlay.d/init.dfe.rc $tmp/init.dfe.rc" &>"$my_log"
         fi
 
         $BB unzip -o "$tmp/$magisk_ver_install.zip" \
-            "lib/$CPU/libmagisk64.so" -j -d $tmp_boot &>$(dirname $arg3)/log.txt
+            "lib/$CPU/libmagisk64.so" -j -d $tmp_boot &>"$my_log"
         $BB unzip -o "$tmp/$magisk_ver_install.zip" \
-            "lib/$CPU/libmagisk32.so" -j -d $tmp_boot &>$(dirname $arg3)/log.txt
+            "lib/$CPU/libmagisk32.so" -j -d $tmp_boot &>"$my_log"
         [ -f $tmp_boot/libmagisk64.so ] && inject_my_magisk=$tmp_boot/libmagisk64.so
         [ -f $tmp_boot/libmagisk32.so ] && inject_my_magisk=$tmp_boot/libmagisk32.so
-        $MB cpio ramdisk.cpio "exists .backup/.magisk" &>$(dirname $arg3)/log.txt && {
-            $MB cpio ramdisk.cpio "extract .backup/.magisk fconfig" &>$(dirname $arg3)/log.txt
+        $MB cpio ramdisk.cpio "exists .backup/.magisk" &>"$my_log" && {
+            $MB cpio ramdisk.cpio "extract .backup/.magisk fconfig" &>"$my_log"
         }
         (grep -q "KEEPVERITY=true" fconfig) && sed -i 's|KEEPVERITY=true|KEEPVERITY=false|' fconfig
         (grep -q "KEEPFORCEENCRYPT=true" fconfig) && sed -i 's|KEEPFORCEENCRYPT=true|KEEPFORCEENCRYPT=false|' fconfig

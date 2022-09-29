@@ -16,7 +16,7 @@ if ! [ $little_arch = $big_arch ] ; then
 $BB unzip -o "$tmp/$magisk_ver_install.zip" "lib/$little_arch/libmagisk32.so" -j -d $INSTALLER/ &>"$my_log" || my_abort "44" "Cant unzip $arg3"
 fi
 for file in $INSTALLER/lib*.so ; do
-$BB mv $file $( dirname $file )$( basename $file | sed 's|lib||' | sed 's|.so||' )
+$BB mv $file $( dirname $file )/$( basename $file | sed 's|lib||' | sed 's|.so||' )
 done
 # $INSTALLER/magiskboot{arch}:busybox{arch}:bootctl{all}:magisk32/64:magiskinit:magiskpolicy:all files in assets folder
 
@@ -29,7 +29,7 @@ CHROMEDIR=$INSTALLER/chromeos
 [ -f $COMMONDIR/util_functions.sh ] || my_abort "7" "! Unable to extract zip file!"
 
 # Backup magisk scripts
-mkdir -pv $tmp/magisk_files_tmp
+mkdir -pv $tmp/magisk_files_tmp &>"$my_log"
 $BB cp -af $COMMONDIR/* $tmp/magisk_files_tmp/
 
 for file in $COMMONDIR/*.sh; do

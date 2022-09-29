@@ -30,6 +30,13 @@ Language=english
 # ================================================== #
 Force reading arguments.txt=false
 # ================================================== #
+
+stable-25.2-25200|stable-24.3-24300|delta-91fa08ee-25203
+alpha-555a54ec-25203|delta-25.2-25200
+
+Base as magisk=stable-25.2-25200
+
+# ================================================== #
 Flash DFE= true
 Disable AVB= true
 Disable QUOTA= true

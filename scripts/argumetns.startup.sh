@@ -1,5 +1,9 @@
 #!/sbin/sh
 . $tmp/LNG/english.sh
+
+magisk_ver_install="magisk-zips/stable-25.2-25200"
+
+
 if (mygrep_arg "Force reading arguments.txt" | grep -q "true"); then
     MYLNG=$(mygrep_arg "Language")
     [[ -f $tmp/LNG/${MYLNG}.sh ]] && . $tmp/LNG/${MYLNG}.sh || $tmp/LNG/english.sh
@@ -44,9 +48,9 @@ if ! (mygrep_arg "Force reading arguments.txt" | grep -q "true"); then
     if $my_magisk_installer && [ -d /data/data/com.termux/ ] && ! [ "$4" == "termux" ]; then
         {
             MYSELECT \
-                "Open Termux for further installation?" \
-                "OPEN TERMUX:select:YES:comment:More UI stability in TERMUX" \
-                "CONTINUE IN MAGISK-APP:select:NO:comment:Less UI stability in MAGISK"
+                "$text107" \
+                "$text108:select:$text24:comment:$text110" \
+                "$text109:select:$text33:comment:$text111"
         } && {
             rm -f /data/data/com.termux/customize.sh /data/data/com.termux/install.zip
             unzip -o "$arg3" \
@@ -65,38 +69,38 @@ if ! (mygrep_arg "Force reading arguments.txt" | grep -q "true"); then
     fi
 fi
 
-my_print "Welcome to DFE-NEO $DFENV"
-my_print "by TG/XDA - LeeGarChat"
-my_print "TG group @PocoF3DFE"
-my_print "Thanks for the Magisk team"
+my_print "$text11 $DFENV"
+my_print "$text12"
+my_print "$text13"
+my_print "$text14"
 #DEL="$MYSKIPP>> $( dirname $arg3 )/log.txt"
 
 # Device A/B check
 
 #sleep 1
 
-my_print "Devices: $(getprop ro.build.product)"
-my_print "Model: $(getprop ro.product.model)"
-my_print "CPU architecture: $CPU"
-[ -z "$slot_ab" ] || my_print "Detected active slot: $slot_ab"
+my_print "$text8: $(getprop ro.build.product)"
+my_print "$text9: $(getprop ro.product.model)"
+my_print "$text10: $CPU"
+[ -z "$slot_ab" ] || my_print "$text15: $slot_ab"
 
 read_argumetns_file
 if (mygrep_arg "Force reading arguments.txt" | grep -q "true"); then
     first_select=2
 else
     ui_print " "
-    my_print "Parameters that are written in arguments.txt :"
+    my_print "$text121"
     reset_arguments
     read_argumetns_file
     show_arguments
     ui_print " "
-    my_print "Volume up (+) for switching"
-    my_print "Volume down (-) for select"
+    my_print "$text5"
+    my_print "$text6"
     {
         MYSELECT \
-            "Do you want to use arguments.txt?" \
-            "Configure Arguments now" \
-            "Use arguments.txt"
+            "$text16" \
+            "$text104" \
+            "$text19"
     } && first_select=1 || first_select=2
 fi
 case $first_select in
@@ -106,9 +110,9 @@ case $first_select in
 
     {
         MYSELECT \
-            "Install DFE-NEO or DFE-Legacy?" \
-            "Install NEO method:select:DFE-NEO:comment:The boot partition will be patched. RW rights are not necessary" \
-            "Install Legacy method:select:DFE-LEGACY:comment:The vendor section will be patched or another section in which fstabs will be located. Need RW rights"
+            "$text20" \
+            "Install NEO method:select:DFE-NEO:comment:$text21" \
+            "Install Legacy method:select:DFE-LEGACY:comment:$text22"
     } && legacy_mode=false || legacy_mode=true
 
     MYSELECT \
@@ -128,104 +132,104 @@ case $first_select in
 
     {
         MYSELECT \
-            "Do you want to adjust the patching parameters of DFE QUOTA AVB?" \
-            "DEFAULT" \
-            "YES"
+            "$text23" \
+            "$text25" \
+            "$text24"
     } && {
         AVB_STAY=true
         QUOTA_STAY=true
     } || {
         {
             MYSELECT \
-                "Disable QUOTA?" \
-                "NO" \
-                "YES"
+                "$text26" \
+                "$text33" \
+                "$text24"
         } && QUOTA_STAY=false || QUOTA_STAY=true
         {
             MYSELECT \
-                "Disable AVB?" \
-                "NO" \
-                "YES"
+                "$text29" \
+                "$text33" \
+                "$text24"
         } && AVB_STAY=false || AVB_STAY=true
     }
     $my_magisk_installer && {
         {
             MYSELECT \
-                "Reflash recovery after OTA?" \
-                "YES" \
-                "NO"
+                "$text32" \
+                "$text24" \
+                "$text33"
         } && Reflash_Recovery_After_Oat=true || Reflash_Recovery_After_Oat=false
     } || {
         {
             MYSELECT \
-                "Do you want to reinstall the current Recovery? The function works correctly only for devices, where RECOVERY is in BOOT" \
-                "YES" \
-                "NO"
+                "$text34" \
+                "$text24" \
+                "$text33"
         } && Flash_Current_Rerovery=true || Flash_Current_Rerovery=false
     }
     {
         MYSELECT \
-            "Do you want to install the built-in DFE-NEO Magisk v${MAGISK_VER}?" \
-            "YES" \
-            "NO"
+            "$text35${MAGISK_VER}?" \
+            "$text24" \
+            "$text33"
     } && Flash_Magisk=true || Flash_Magisk=false
     {
         MYSELECT \
-            "Do you want to hide the disabled encryption of the device? For example, the device settings will show that your device is encrypted, but in fact it is decrypted" \
-            "NOT HIDDEN:comment:The system will detect that your phone has been decrypted" \
-            "HIDDEN:comment:The system will display that your phone is encrypted. for more stability"
+            "$text36" \
+            "$text40:comment:$text38" \
+            "$text39:comment:$text37"
     } && Hide_No_Encryption=false || Hide_No_Encryption=true
     {
         MYSELECT \
-            "Do you want to configure additional features?" \
-            "YES" \
-            "NO"
+            "$text41" \
+            "$text24" \
+            "$text33"
     } && {
         $Flash_Magisk && {
             MYSELECT \
-                "Enable in-built DFE-NEO Safetynet fix?" \
-                "ENABLE:select:YES" \
-                "DISABLE:select:NO"
+                "$text115" \
+                "$text116:select:$text24" \
+                "$text117:select:$text33"
         } && safetyfix=true || safetyfix=false
         $Flash_Magisk && {
             MYSELECT \
-                "Force to enable zygisk mode for magisk at system startup? After installing DFE-NEO, zygisk mode for magisk will be permanently enabled, to turn it off, you will need to flash DFE-NEO without this mode" \
-                "FORCE ENABLE ZYGISK:select:YES" \
-                "DISABLE FORCE ZYGISK:select:NO"
+                "$text125" \
+                "FORCE ENABLE ZYGISK:select:$text24" \
+                "DISABLE FORCE ZYGISK:select:$text33"
         } && force_zygisk=true || force_zygisk=false
         $Flash_Magisk && {
             MYSELECT \
-                "Add custom packages/applications automatically to denylist after system boot? The zygisk mode must be enabled. Packages in denylist.txt : $(wc -l $tmp/denylist.txt | awk '{print $1}')" \
-                "ENABLE CUSTOM DENYLIST:select:YES" \
-                "NOT YET:select:NO"
+                "$text124 $(wc -l $tmp/denylist.txt | awk '{print $1}')" \
+                "ENABLE CUSTOM DENYLIST:select:$text24" \
+                "NOT YET:select:$text33"
         } && add_deny_list=true || add_deny_list=false
         {
             MYSELECT \
-                "Skip the mini tutorial on proper use after installation?" \
-                "DONT SKIP:select:NO" \
-                "SKIP:select:YES"
+                "$text42" \
+                "$text44:select:$text33" \
+                "$text43:select:$text24"
         } && skip_warning=false || skip_warning=true
         {
             MYSELECT \
-                "Do wipe data after successful installation?" \
-                "DONT WIPE:select:NO:comment:If your device has already been decrypted and you are updating the ROM" \
-                "WIPE DATA:select:YES:comment:if your device is already decrypted and you change the ROM"
+                "$text48" \
+                "$text50:select:$text33:comment:$text52" \
+                "$text49:select:$text24:comment:$text51"
         } && wipe_data=false || wipe_data=true
         (! $wipe_data && [ -f /data/system/locksettings.db ] && ! $my_magisk_installer) && {
             MYSELECT \
-                "Do you want to remove the lockscreen pin?" \
-                "DONT TOUCH LOCKCREEN:select:NO" \
-                "REMOVE LOCKCREEN PIN:select:YES"
+                "$text45" \
+                "$text47:select:$text33" \
+                "$text46:select:$text24"
         } && rem_lock=false || rem_lock=true
         {
             MYSELECT \
-                "Do you want to disable the dynamic refresh rate of the display? Only for MIUI" \
-                "DISABLE DYNAMIC REFRESH RATE:select:YES" \
-                "RETAIN DYNAMIC REFRESH RATE:select:NO"
+                "$text58" \
+                "$text59:select:$text24" \
+                "$text60:select:$text33"
         } && dynamic120hz=true || dynamic120hz=false
         MYSELECT \
-            "Restart the device after a successful installation?" \
-            "DONT RESTART:select:NO" \
+            "$text53" \
+            "$text54:select:$text33" \
             "RESTART TO SYSTEM:select:SYSTEM" \
             "RESTART TO RECOVERY:select:RECOVERY" \
             "RESTART TO BOOTLOADER/FASTBOOT:select:BOOTLOADER/FASTBOOT"
@@ -257,7 +261,7 @@ fi
 
 timer_start2=$(date +%s%N)
 
-my_print "Starting the installation with these parameters:"
+my_print "$text61"
 
 show_arguments
 
