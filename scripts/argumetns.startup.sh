@@ -78,7 +78,7 @@ my_print "Thanks for the Magisk team"
 my_print "Devices: $(getprop ro.build.product)"
 my_print "Model: $(getprop ro.product.model)"
 my_print "CPU architecture: $CPU"
-my_print "Detected active slot: $slot_ab"
+[ -z "$slot_ab" ] || my_print "Detected active slot: $slot_ab"
 
 read_argumetns_file
 if (mygrep_arg "Force reading arguments.txt" | grep -q "true"); then
@@ -110,6 +110,22 @@ case $first_select in
             "Install NEO method:select:DFE-NEO:comment:The boot partition will be patched. RW rights are not necessary" \
             "Install Legacy method:select:DFE-LEGACY:comment:The vendor section will be patched or another section in which fstabs will be located. Need RW rights"
     } && legacy_mode=false || legacy_mode=true
+
+    MYSELECT \
+        "Which version of magisk-init, as well as in case of installing magisk built into dfe, to use to install/patch the boot image" \
+        "Use MAGISK STABLE v25.2 OFFICIAL:select:25.2-S:comment:The official latest stable version of magisk" \
+        "Use MAGISK STABLE v24.2  OFFICIAL:select:24.3-S:comment:The official old stable version of magisk" \
+        "Use MAGISK ALPHA 555a54ec-25203:select:25.2-A:comment:Maybe official alpha" \
+        "Use MAGISK DELTA-STABLE v25.2:select:25.2-D:comment:Unofficial" \
+        "Use MAGISK DELTA ALPHA 91fa08ee-25203:select:25.2-D:comment:Unofficial"
+    case $? in
+    1) magisk_ver_install="magisk-zips/stable-25.2-25200" ;;
+    2) magisk_ver_install="magisk-zips/stable-24.3-24300" ;;
+    3) magisk_ver_install="magisk-zips/alpha-555a54ec-25203" ;;
+    4) magisk_ver_install="magisk-zips/delta-25.2-25200" ;;
+    5) magisk_ver_install="magisk-zips/delta-91fa08ee-25203" ;;
+    esac
+
     {
         MYSELECT \
             "Do you want to adjust the patching parameters of DFE QUOTA AVB?" \
@@ -245,29 +261,4 @@ my_print "Starting the installation with these parameters:"
 
 show_arguments
 
-$force_zygisk && ! $legacy_mode || {
-    sed -i 's|exec_background u:r:magisk:s0 root root --  ${MAGISKTMP}/init.dfe.sh ${MAGISKTMP} zygisk_on||g' "$tmp"/init.rc
-}
 
-$add_deny_list && ! $legacy_mode || {
-    sed -i 's|exec_background u:r:magisk:s0 root root --  ${MAGISKTMP}/init.dfe.sh ${MAGISKTMP} add_denylist||g' "$tmp"/init.rc
-}
-$Hide_No_Encryption || {
-    sed -i 's|setprop ro.crypto.state encrypted||' "$tmp"/init.rc
-}
-$QUOTA_STAY || {
-    sed -i 's|echo "quota"|#echo "quota"|' "$tmp"/init.sh
-}
-$safetyfix || {
-    sed -i 's|exec u:r:magisk:s0 root root --  ${MAGISKTMP}/init.dfe.sh ${MAGISKTMP} safetynet_fs||g' "$tmp"/init.rc
-    sed -i 's|exec u:r:magisk:s0 root root --  ${MAGISKTMP}/init.dfe.sh ${MAGISKTMP} safetynet_init||g' "$tmp"/init.rc
-    sed -i 's|exec u:r:magisk:s0 root root --  ${MAGISKTMP}/init.dfe.sh ${MAGISKTMP} safetynet_boot_complite||g' "$tmp"/init.rc
-}
-$AVB_STAY || {
-    sed -i 's|echo "avb="|#echo "avb="|' "$tmp"/init.sh &&
-        sed -i 's|echo "avb_keys="|#echo "avb_keys="|' "$tmp"/init.sh &&
-        sed -i 's|echo "avb"|#echo "avb"|' "$tmp"/init.sh
-}
-$dynamic120hz && ! $legacy_mode || {
-    sed -i 's|#exec u:r:magisk:s0 root root --  ${MAGISKTMP}/init.dfe.sh ${MAGISKTMP} patch120dynamic|exec u:r:magisk:s0 root root --  ${MAGISKTMP}/init.dfe.sh ${MAGISKTMP} patch120dynamic|' "$tmp"/init.rc
-}

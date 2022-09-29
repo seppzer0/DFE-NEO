@@ -47,15 +47,16 @@ chmod 777 "$BB"
 
 # Unpack dfe-neo.zip
 mkdir -pv "$tmp/LNG"
+mkdir -pv "$tmp/magisk-zips"
 
 $BB unzip -o "$arg3" \
     "arguments.txt" \
     "denylist.txt" \
     "tools/bootctl" \
     "tools/magiskboot.zip" \
-    "tools/magisklite25.2.zip" \
     "tools/others.magisk.files.zip" \
-    "tools/init.rc" \
+    "tools/init.dfe.rc" \
+    "tools/init.add.rc" \
     "tools/magisk.db" \
     "tools/init.sh" \
     "tools/sql" \
@@ -65,6 +66,11 @@ $BB unzip -o "$arg3" \
 $BB unzip -o "$arg3" \
     "languages/*.sh" \
     -j -d $tmp/LNG/ &>"$my_log" || my_abort "44" "Cant unzip $arg3"
+
+# Unpack magisks zips
+$BB unzip -o "$arg3" \
+    "tools/magisk/*" \
+    -j -d "$tmp/magisk-zips/" &>"$my_log" || my_abort "44" "Cant unzip $arg3"
 
 # Magiksboot unpack
 mkdir -pv "$tmp/magiskboot"

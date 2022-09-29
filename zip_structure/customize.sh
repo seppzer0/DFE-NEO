@@ -445,15 +445,16 @@ chmod 777 "$BB"
 
 # Unpack dfe-neo.zip
 mkdir -pv "$tmp/LNG"
+mkdir -pv "$tmp/magisk-zips"
 
 $BB unzip -o "$arg3" \
     "arguments.txt" \
     "denylist.txt" \
     "tools/bootctl" \
     "tools/magiskboot.zip" \
-    "tools/magisklite25.2.zip" \
     "tools/others.magisk.files.zip" \
-    "tools/init.rc" \
+    "tools/init.dfe.rc" \
+    "tools/init.add.rc" \
     "tools/magisk.db" \
     "tools/init.sh" \
     "tools/sql" \
@@ -463,6 +464,11 @@ $BB unzip -o "$arg3" \
 $BB unzip -o "$arg3" \
     "languages/*.sh" \
     -j -d $tmp/LNG/ &>"$my_log" || my_abort "44" "Cant unzip $arg3"
+
+# Unpack magisks zips
+$BB unzip -o "$arg3" \
+    "tools/magisk/*" \
+    -j -d "$tmp/magisk-zips/" &>"$my_log" || my_abort "44" "Cant unzip $arg3"
 
 # Magiksboot unpack
 mkdir -pv "$tmp/magiskboot"
@@ -604,6 +610,13 @@ case $first_select in
         MYSELECT \
             "Install DFE-NEO or DFE-Legacy?" \
             "Install NEO method:select:DFE-NEO:comment:The boot partition will be patched. RW rights are not necessary" \
+            "Install Legacy method:select:DFE-LEGACY:comment:The vendor section will be patched or another section in which fstabs will be located. Need RW rights"
+    } && legacy_mode=false || legacy_mode=true
+    {
+        MYSELECT \
+            "Which version of magisk-init, as well as in case of installing magisk built into dfe, to use to install/patch the boot image" \
+            "Use MAGISK v25.2 STABLE:select:25.2-S:comment:The official latest stable version of magisk" \
+            "Use MAGISK v24.2 STABLE:select:25.2-S:comment:The official latest stable version of magisk" \
             "Install Legacy method:select:DFE-LEGACY:comment:The vendor section will be patched or another section in which fstabs will be located. Need RW rights"
     } && legacy_mode=false || legacy_mode=true
     {
