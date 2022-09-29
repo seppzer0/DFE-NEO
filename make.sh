@@ -67,5 +67,6 @@ cp $folder_dir/tools/* $folder_dir/zip_structure/tools/
 cp $folder_dir/languages/* $folder_dir/zip_structure/languages/
 cp $folder_dir/stuff/* $folder_dir/zip_structure/
 rm -rf $folder_dir/DFE_NEO_GIT_TEST.zip
-$a7za a -r -mmt8 -mx9 $folder_dir/DFE_NEO_GIT_TEST.zip $folder_dir/zip_structure/* -bso0
+$a7za a -r -mmt8 -mx9 $folder_dir/dfe-neo.zip $folder_dir/zip_structure/* -bso0
 rm -rf $folder_dir/zip_structure
+echo " check same make.sh folder. build complite ./dfe-neo.zip"
