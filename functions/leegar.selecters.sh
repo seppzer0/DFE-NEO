@@ -1,6 +1,11 @@
 #!/sbin/sh
 MYSELECT() {
     ui_print ""
+    text_for_select=""
+    text_select=""
+    text_input=""
+    text_commend=""
+    
     [ -z "$1" ] || my_print "$1"
     ui_print ""
     tick_for=1

@@ -3,15 +3,15 @@
 
 export BBBIN="$BB"
 # unzip chromeos and others
-$BB unzip -o "$tmp/others.magisk.files.zip" -d $INSTALLER/ &>"$my_log" || my_abort "44" "Cant unzip $arg3"
 export INSTALLER="$tmp/my_bins"
+$BB unzip -o "$tmp/others.magisk.files.zip" -d $INSTALLER/ &>"$my_log" || my_abort "44" "Cant unzip $arg3"
 $BB unzip -o "$tmp/$magisk_ver_install.zip" "assets/*" -d $INSTALLER &>"$my_log" || my_abort "44" "Cant unzip $arg3"
-$BB mv "$INSTALLER/assets/*" "$INSTALLER/"
+$BB mv $INSTALLER/assets/* $INSTALLER/
 # $INSTALLER/magiskboot{arch}:busybox{arch}:bootctl{all}:all files in assets folder
 
 export ASH_STANDALONE=1
 
-$BB unzip -o "$tmp/$magisk_ver_install.zip" "lib/$big_arch" -j -d $INSTALLER/ &>"$my_log" || my_abort "44" "Cant unzip $arg3"
+$BB unzip -o "$tmp/$magisk_ver_install.zip" "lib/$big_arch/*" -j -d $INSTALLER/ &>"$my_log" || my_abort "44" "Cant unzip $arg3"
 if ! [ $little_arch = $big_arch ] ; then 
 $BB unzip -o "$tmp/$magisk_ver_install.zip" "lib/$little_arch/libmagisk32.so" -j -d $INSTALLER/ &>"$my_log" || my_abort "44" "Cant unzip $arg3"
 fi

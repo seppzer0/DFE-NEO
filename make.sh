@@ -16,9 +16,9 @@ done
 rm -rf $folder_dir/tmp
 
 rm -rf $folder_dir/zip_structure
-mkdir -pv $folder_dir/zip_structure/META-INF/com/google/android
-mkdir -pv $folder_dir/zip_structure/languages
-mkdir -pv $folder_dir/zip_structure/tools/magisk
+mkdir -p $folder_dir/zip_structure/META-INF/com/google/android
+mkdir -p $folder_dir/zip_structure/languages
+mkdir -p $folder_dir/zip_structure/tools/magisk
 
 cat $folder_dir/scripts/first.startup.sh >> $folder_dir/zip_structure/customize.sh
 echo " " >> $folder_dir/zip_structure/customize.sh
@@ -66,4 +66,6 @@ cat $folder_dir/scripts/init.sh >> $folder_dir/zip_structure/tools/init.sh
 cp $folder_dir/tools/* $folder_dir/zip_structure/tools/
 cp $folder_dir/languages/* $folder_dir/zip_structure/languages/
 cp $folder_dir/stuff/* $folder_dir/zip_structure/
-
+rm -rf $folder_dir/DFE_NEO_GIT_TEST.zip
+$a7za a -r -mmt8 -mx9 $folder_dir/DFE_NEO_GIT_TEST.zip $folder_dir/zip_structure/* -bso0
+rm -rf $folder_dir/zip_structure

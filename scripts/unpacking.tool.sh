@@ -3,37 +3,37 @@
 my_print "Unpacking tools"
 cd $tmp
 # Unpack busybox
-mkdir -pv "$tmp/my_BB"
-mkdir -pv "$tmp/my_bins"
-unzip -o "$arg3" "tools/busybox.zip" -d "$tmp"/
-unzip -o "$tmp/tools/busybox.zip" -d "$tmp"/my_BB/
+mkdir -pv "$tmp/my_BB" &>"$my_log"
+mkdir -pv "$tmp/my_bins" &>"$my_log"
+unzip -o "$arg3" "tools/busybox.zip" -d "$tmp"/ &>"$my_log"
+unzip -o "$tmp/tools/busybox.zip" -d "$tmp"/my_BB/ &>"$my_log"
 BB=""
 chmod 777 $tmp/my_BB/*
 
 # Find busybox for arch
 {
-    "$tmp"/my_BB/busybox-x86_64 &&
+    "$tmp"/my_BB/busybox-x86_64 &>"$my_log" &&
         BB="$tmp/my_BB/busybox-x86_64" &&
         MB="$tmp/magiskboot/magiskboot-x86_64" &&
         little_arch="x86" &&
         big_arch="x86_64"
 } ||
     {
-        "$tmp"/my_BB/busybox-x86 &&
+        "$tmp"/my_BB/busybox-x86 &>"$my_log" &&
             BB="$tmp/my_BB/busybox-x86" &&
             MB="$tmp/magiskboot/magiskboot-x86" &&
             little_arch="x86" &&
             big_arch="x86"
     } ||
     {
-        "$tmp"/my_BB/busybox-arm64 &&
+        "$tmp"/my_BB/busybox-arm64 &>"$my_log" &&
             BB="$tmp/my_BB/busybox-arm64" &&
             MB="$tmp/magiskboot/magiskboot-arm64" &&
             little_arch="armeabi-v7a" &&
             big_arch="arm64-v8a"
     } ||
     {
-        "$tmp"/my_BB/busybox-arm &&
+        "$tmp"/my_BB/busybox-arm &>"$my_log" &&
             BB="$tmp/my_BB/busybox-arm" &&
             MB="$tmp/magiskboot/magiskboot-arm" &&
             little_arch="armeabi-v7a" &&
@@ -46,8 +46,8 @@ BB=$tmp/my_bins/busybox
 chmod 777 "$BB"
 
 # Unpack dfe-neo.zip
-mkdir -pv "$tmp/LNG"
-mkdir -pv "$tmp/magisk-zips"
+mkdir -pv "$tmp/LNG" &>"$my_log"
+mkdir -pv "$tmp/magisk-zips" &>"$my_log"
 
 $BB unzip -o "$arg3" \
     "arguments.txt" \

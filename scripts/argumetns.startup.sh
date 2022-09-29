@@ -16,9 +16,9 @@ elif [[ -z $LNGarg ]]; then
     for files in $LNGL2; do
         . ${LNG_tmp}$files.sh
         my_print "> [$files]" "selected"
-        my_print "{Choose English language: Thank you all for the translation}"
-        my_print "Volume up (+) for switching" "selected"
-        my_print "Volume down (-) for select" "selected"
+        my_print "$text105}"
+        my_print "$text17" "selected"
+        my_print "$text18" "selected"
         ui_print " "
     done
     while true; do

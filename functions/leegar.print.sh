@@ -42,7 +42,7 @@ else
     if [ -z "${in_text}" ] || [ "${in_text}" == " " ]; then
         ui_print " "
     else
-        $first_line && ui_print "- ${in_text}" || i_print "  ${in_text}"
+        $first_line && ui_print "- ${in_text}" || ui_print "  ${in_text}"
     fi
 fi
 }
