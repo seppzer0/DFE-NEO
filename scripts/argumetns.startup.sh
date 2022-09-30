@@ -6,12 +6,12 @@ magisk_ver_install="magisk-zips/stable-25.2-25200"
 
 if (mygrep_arg "Force reading arguments.txt" | grep -q "true"); then
     MYLNG=$(mygrep_arg "Language")
-    [[ -f $tmp/LNG/${MYLNG}.sh ]] && . $tmp/LNG/${MYLNG}.sh || $tmp/LNG/english.sh
+    [ -f $tmp/LNG/${MYLNG}.sh ] && . $tmp/LNG/${MYLNG}.sh || $tmp/LNG/english.sh
 elif [[ -z $LNGarg ]]; then
     LNG_tmp=$tmp/LNG/
     A=1
     for files in ${LNG_tmp}*; do
-        [[ -z $LNGL ]] &&
+        [ -z $LNGL ] &&
             LNGL="$(basename ${files%.sh*})$LNGL" ||
             LNGL="$(basename ${files%.sh*})\n$LNGL"
         LNGL2="$(basename ${files%.sh*}) $LNGL2"

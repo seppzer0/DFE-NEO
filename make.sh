@@ -38,11 +38,11 @@ cat $folder_dir/functions/leegar.dfe.sh | sed 's|#!/sbin/sh|#leegar.dfe|' >> $fo
 echo " " >> $folder_dir/zip_structure/customize.sh
 cat $folder_dir/functions/leegar.mount.sh | sed 's|#!/sbin/sh|#leegar.mount|' >> $folder_dir/zip_structure/customize.sh
 echo " " >> $folder_dir/zip_structure/customize.sh
+cat $folder_dir/functions/leegar.magisk.unpack.sh | sed 's|#!/sbin/sh|#leegar.magisk.unpack|' >> $folder_dir/zip_structure/customize.sh
+echo " " >> $folder_dir/zip_structure/customize.sh
 cat $folder_dir/scripts/unpacking.tool.sh | sed 's|#!/sbin/sh|#unpacking.tool|' >> $folder_dir/zip_structure/customize.sh
 echo " " >> $folder_dir/zip_structure/customize.sh
 cat $folder_dir/scripts/argumetns.startup.sh | sed 's|#!/sbin/sh|#argumetns.startup|' >> $folder_dir/zip_structure/customize.sh
-echo " " >> $folder_dir/zip_structure/customize.sh
-cat $folder_dir/scripts/unpacking.magisk.sh | sed 's|#!/sbin/sh|#unpacking.magisk|' >> $folder_dir/zip_structure/customize.sh
 echo " " >> $folder_dir/zip_structure/customize.sh
 cat $folder_dir/scripts/patching.boot.sh | sed 's|#!/sbin/sh|#patching.boot|' >> $folder_dir/zip_structure/customize.sh
 echo " " >> $folder_dir/zip_structure/customize.sh

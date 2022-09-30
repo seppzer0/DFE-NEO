@@ -109,6 +109,29 @@ for forslot in $(
         $MB cpio ramdisk.cpio "exists overlay.d/init.add.rc" &>"$my_log" && $MB cpio ramdisk.cpio "rm overlay.d/init.add.rc" &>"$my_log"
         $MB cpio ramdisk.cpio "exists overlay.d/sbin/dfe_neo_support_binary" &>"$my_log" && $MB cpio ramdisk.cpio "rm overlay.d/sbin/dfe_neo_support_binary" &>"$my_log"
 
+        x86_64 x86 arm64-v8a armeabi-v7a
+
+        if $MB cpio ramdisk.cpio "exists system/bin/init" &>"$my_log"; then
+            $MB cpio ramdisk.cpio "extract system/bin/init ramdisk.init" &>"$my_log"
+        elif $MB cpio ramdisk.cpio "exists .backup/init" &>"$my_log"; then
+            $MB cpio ramdisk.cpio "extract .backup/init ramdisk.init" &>"$my_log"
+        elif $MB cpio ramdisk.cpio "exists init" &>"$my_log"; then
+            $MB cpio ramdisk.cpio "extract init ramdisk.init" &>"$my_log"
+        fi
+
+        cp -af $BINDIR/* $tmp_boot/
+        chmod -R 755 $tmp_boot
+        BOOTIMAGE=$boot
+        cd $tmp_boot
+        sed -i 's|cd|#cd|' $tmp_boot/boot_patch.sh
+        sed -i 's|./magiskboot unpack|#./magiskboot unpack|' $tmp_boot/boot_patch.sh
+        sed -i 's|./magiskboot repack|#./magiskboot repack|' $tmp_boot/boot_patch.sh
+        if [ ! -c $BOOTIMAGE ]; then
+            eval $BOOTSIGNER -verify <$BOOTIMAGE && BOOTSIGNED=true
+            $BOOTSIGNED && ui_print "- Boot image is signed with AVB 1.0"
+        fi
+        SOURCEDMODE=true
+
         if $Flash_Current_Rerovery && ! $my_magisk_installer && ! [ $forslot = "A_only" ]; then
             ! $my_magisk_installer && mount_part --umount
             ramdisk_files=$(find / -maxdepth 1 -type f -name "*ramdisk-files*" -and -not -name "*.txt")
@@ -138,25 +161,8 @@ for forslot in $(
         fi
 
         if $Flash_Magisk; then
-
-            cp -af $BINDIR/* $tmp_boot/
-            chmod -R 755 $tmp_boot
-
             my_print "$text77$MAGISK_VER $($A_only || echo $text78 $forslot)"
-
-            BOOTIMAGE=$boot
             cd $tmp_boot
-
-            sed -i 's|cd|#cd|' $tmp_boot/boot_patch.sh
-            sed -i 's|./magiskboot unpack|#./magiskboot unpack|' $tmp_boot/boot_patch.sh
-            sed -i 's|./magiskboot repack|#./magiskboot repack|' $tmp_boot/boot_patch.sh
-            if [ ! -c $BOOTIMAGE ]; then
-                eval $BOOTSIGNER -verify <$BOOTIMAGE && BOOTSIGNED=true
-                $BOOTSIGNED && ui_print "- Boot image is signed with AVB 1.0"
-            fi
-
-            # Source the boot patcher
-            SOURCEDMODE=true
             . ./boot_patch.sh "$BOOTIMAGE" &>"$my_log"
             case $? in
             1) abort "! Insufficient partition size" ;;
@@ -184,20 +190,6 @@ for forslot in $(
             0)
                 my_print "$text82 $($A_only || echo $text78 $forslot)"
                 my_print "$text83 $($A_only || echo $text78 $forslot)"
-                cp -af $BINDIR/* $tmp_boot/
-                chmod -R 755 $tmp_boot
-                BOOTIMAGE=$boot
-                cd $tmp_boot
-                sed -i 's|cd|#cd|' $tmp_boot/boot_patch.sh
-                sed -i 's|./magiskboot unpack|#./magiskboot unpack|' $tmp_boot/boot_patch.sh
-                sed -i 's|./magiskboot repack|#./magiskboot repack|' $tmp_boot/boot_patch.sh
-                if [ ! -c $BOOTIMAGE ]; then
-                    eval $BOOTSIGNER -verify <$BOOTIMAGE && BOOTSIGNED=true
-                    $BOOTSIGNED && ui_print "- Boot image is signed with AVB 1.0"
-                fi
-
-                # Source the boot patcher
-                SOURCEDMODE=true
                 . ./boot_patch.sh "$BOOTIMAGE" &>$(dirname $arg3)/log.txt
                 case $? in
                 1) abort "! Insufficient partition size" ;;
