@@ -1,4 +1,3 @@
-#!/sbin/sh
 text1="Kode Kesalahan"
 text2="Lanjutkan dengan resiko ditanggung oleh kalian sendiri"
 text3="LANJUTKAN"

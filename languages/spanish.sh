@@ -1,4 +1,3 @@
-#!/sbin/sh
 text1="Codigo error"
 text2="Puedes continuar bajo tu propio riesgo."
 text3="SEGUIR"

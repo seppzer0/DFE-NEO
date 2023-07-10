@@ -1,4 +1,3 @@
-#!/sbin/sh
 text1="Mã lỗi"
 text2="Bạn có thể tiếp tục với rủi ro của riêng bạn"
 text3="TIẾP TỤC"

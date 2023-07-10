@@ -1,4 +1,3 @@
-#!/sbin/sh
 text1="Hibakód"
 text2="Csak saját felelősségre folytasd"
 text3="TOVÁBB"
